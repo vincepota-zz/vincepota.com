@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+{% block title %}Home | {{ SITENAME }}{% endblock %}
+{% block metadesc %}{% endblock %}
+
+{% block header %}{% endblock %}
+{% block content %}
+<!-- <img class="round" src="/images/headshot.jpg" alt="{{ SITENAME }}"> -->
+
+<h1 class="article-title">{{ ABOUT_PAGE_HEADER }}</h1>
+  <div class="article-content">
+    {% for page in pages %}
+        {% if page.title == 'About' %}
+            {{ page.content }}
+        {% endif %}
+    {% endfor %}
+
+    <hr class="small">
+
+<center>
+    <h2>Articles</h2>
+</center>
+      <div class = "twelve columns offset-by-two">
+      {% for article in articles %}
+      <div class="row">
+          <div class="six columns"><p><a href={{ article.url }}>{{ article.title }}</a></p></div>
+          <div class="six columns"><p>{{ article.date.strftime('%B %d, %Y') }}</p></div>
+     </div>
+      {% endfor %}
+     </div>
+
+
+    <!-- keep for later usage
+    <hr class="small">
+    {% for page in pages %}
+        {% if page.title == 'Talks' %}
+            {{ page.content }}
+        {% endif %}
+    {% endfor %} -->
+  </div>
+
+
+<hr class="large">
+{% endblock %}

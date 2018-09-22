@@ -1,0 +1,40 @@
+<!-- Navigation
+================================================== -->
+<nav class="navbar">
+  <div class="navbar-brand six columns">
+      <ul>
+        <li>
+          <h1><a href="/" title="Home">{{ SITENAME }}</a></h1>
+        </li>
+      </ul>
+      <ul id="social-icons">
+        {% for nav in NAVIGATION %}
+        <li>
+          <a class="icon" target="_blank" href="{{ nav['url'] }}" title="{{ nav['site'].title() }}">
+            <i class="fa fa-{{ nav['site'] }}"></i>
+          </a>
+        </li>
+        {% endfor %}
+        <!-- <li>
+          <a class="icon" target="_blank" href="{{ FEED_DOMAIN }}/{{ FEED_ALL_ATOM }}" title="Subscribe (Atom)">
+            <i class="fa fa-rss"></i>
+          </a>
+        </li> -->
+        <li>
+          <a class="icon" target="_blank" href="mailto:vincenzo.pota@gmail.com" title="Email">
+            <i class="fa fa-envelope-o"></i>
+          </a>
+        </li>
+      </ul> <!-- End social-icons ul -->
+    </div> <!-- End navbar-brand -->
+
+  <div class="navbar-links">
+      <ul>
+        {% for page in pages %}
+            {%if page.title == 'Astronomy'%}
+                <li><a href="{{ SITEURL }}/{{ page.url }}">{{ page.title }}</a></li>
+            {% endif%}
+         {% endfor %}
+      </ul>
+    </div>
+</nav> <!-- End navbar -->

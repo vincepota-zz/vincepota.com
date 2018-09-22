@@ -1,0 +1,469 @@
+/*
+* Author: Greg Reda
+* Date: 2015-01-22
+* MIT License
+* Based off of a pelican theme I previously wrote ...
+* meaning I'm procrastinating on cleaning all this up.
+*/
+
+{margin: 0; padding: 0;}
+html, body {
+	height: 100%;
+	color: #2E2E2E !important;
+}
+h1, h2, h3, h4, h5, h6 {
+	font-family: "Merriweather", serif;
+	margin-top: 20px;
+}
+h1 { font-size: 28px; }
+h2 { font-size: 24px; }
+h3 { font-size: 20px; }
+h4 { font-size: 18px; }
+h5 { font-size: 16px; }
+h6 { font-size: 14px; }
+
+.container {
+	min-height: 100%;
+	margin-left: auto;
+	margin-right: auto;
+}
+
+footer {
+	text-align: center;
+	margin-left: auto !important;
+	margin-right: auto !important;
+}
+
+#content {
+	margin-top: 70px;
+	margin-left: auto;
+	margin-right: auto;
+}
+
+#content img {
+	display: block;
+	margin-left: auto;
+	margin-right: auto;
+	max-width: 90%;
+}
+
+
+/* Navbar
+**************************************/
+nav {
+	position: fixed;
+	top: 0;
+	left: 0;
+}
+
+.navbar {
+	display: block;
+	background-color: #fff;
+	/*min-height: 50px;*/
+	/*line-height: 50px;  vertically center text within navbar */
+	width: 100%;
+	border-bottom: 1px solid #eee;
+}
+.navbar ul { margin: 0 0 0 0 !important; }
+.navbar ul li {
+	display: inline;
+	/* line-height: 0px; */
+}
+.navbar a {
+	font-weight: bold;
+}
+
+#logo {
+	height: 35px;
+	border: 1px solid #555;
+	float: left;
+	line-height: 50px;
+	margin-top: 7px;
+/* ^^^^^
+Because vertically centering things with CSS is a fucking nightmare,
+I'm going to do this the shitty hack way and just specify a margin-top.
+7px = ( .navbar:height - img:height ) / 2 ...
+and I'm rounding down because it looked better.
+
+If someone sees this comment and knows the right way to do it,
+please email me.
+*/
+}
+.navbar-brand { float: left; }
+.navbar-brand h1 {
+	letter-spacing: -2px;
+	margin-top: 0px;
+	margin-bottom: 0px;
+	margin-left: 10px;
+	margin-right: 10px;
+	float: left;
+}
+.navbar-brand .icon {
+	line-height: 40px;
+}
+
+.navbar-links {
+	float: right;
+	padding-right: 20px;
+}
+.navbar-links ul { text-align: right; }
+.navbar-links ul li {
+  margin: 0 0 0 20px;
+  line-height: 40px;
+}
+.navbar-links a {
+  text-decoration: none;
+  text-transform: uppercase;
+  font-family: 'Open Sans', sans-serif;
+	font-size: 1.6rem;
+	line-height: 40px;
+}
+
+/* Links
+**************************************/
+a, a:visited {
+	color: #000;
+	text-decoration: none !important;
+	font-weight: bold;
+}
+
+a.icon, a:visited.icon, a:active.icon {
+	font-size: 17px;
+	font-weight: bold;
+}
+a:hover.icon, a:focus.icon { color: #222; }
+
+
+/* Horizontal Rulers
+**************************************/
+hr.large {
+	border: none;
+	height: 2px;
+	background-color: #ebebeb;
+	margin: 10px 10px;
+}
+
+hr.small {
+	margin: 5px 0px;
+}
+
+
+/* Article Design
+**************************************/
+.article-title {
+	clear: both;
+	margin-top: 0px !important;
+}
+h1.article-title { line-height: normal; }
+.article-date {
+	font-style: italic;
+	margin: 8px 0px 8px;
+}
+.article-tags {  }
+.article-summary { clear: both; }
+
+
+.article-content { clear: both; overflow: hidden; }
+
+.article-content p {
+	margin: 12px 0px 12px 0px !important;
+	font-family: 'Open Sans', sans-serif;
+	font-weight: 400;
+	line-height: 1.4em;
+	font-size: 18px;
+}
+.article-content > ol, ul {
+	font-family: 'Open Sans', sans-serif;
+	font-weight: 400;
+	line-height: 1.4em;
+	font-size: 18px;
+}
+.article-content > ul {
+   list-style-type: disc;
+   list-style-position: outside;
+	 margin-left: 20px;
+}
+.article-content > ol {
+   list-style-type: decimal;
+   list-style-position: outside;
+}
+.article-content > ul ul, ol ul {
+   list-style-type: circle;
+   list-style-position: outside;
+   margin-left: 15px;
+}
+.article-content > ol ol, ul ol {
+   list-style-type: lower-latin;
+   list-style-position: outside;
+   margin-left: 15px;
+}
+.caption { font-size: 12px !important; }
+blockquote {
+	padding: 0px 20px 0px 20px !important;
+	border-left: 2px solid #ddd !important;
+}
+.back-to-home { margin-bottom: 10px; }
+.center { text-align: center; }
+
+
+/*  Page design */
+
+.page-content img {
+  margin-left: 0;
+  margin-right: 0;
+	max-width: 85%;
+}
+
+/* Article Sharing - Social links at bottom
+*********************************************/
+.article-sharing {
+	margin-top: 0 auto;
+	padding-bottom: 10px;
+}
+.article-sharing ul { margin: 0 0 0 0 !important; }
+.article-sharing ul li {
+	margin: 0 0 0 0 !important;
+	display: inline;
+}
+
+
+/* Mailchimp
+**************************************/
+#mc_embed_signup {
+	background: #fff;
+	clear: left;
+	width: 650px;
+}
+
+#mc_embed_signup input.button { visibility: visible !important; }
+
+
+/* Code Formatting
+**************************************/
+/*code, pre.ipynb {
+	font-family: "Source Code Pro", monospace !important;
+	font-size: 13px !important;
+}*/
+
+.highlight, pre {
+	font-family: "Source Code Pro", monospace !important;
+	font-size: 12px;
+	line-height: 125%;
+	padding: 5px 10px 5px 10px;
+	border-radius: 4px;
+}
+
+
+/* Override IPython Notebook Styles
+**************************************/
+div.output_stream pre {	font-size: 12px !important; }
+div.output_wrapper { position: static !important; }
+div.cell { margin: 0 !important; }
+div.prompt { display: none; }
+
+/* IPyNB strips out most of the .rendered_html CSS
+*	Adding it back here so things look right.
+*	https://github.com/danielfrg/pelican-ipynb/blob/master/core.py#L106
+**************************************/
+.rendered_html table {
+  margin-left: 0;
+  margin-right: 0;
+}
+.rendered_html img {
+  margin-left: 0;
+  margin-right: 0;
+}
+.rendered_html em {
+  font-style: italic;
+}
+.rendered_html strong {
+  font-weight: bold;
+}
+.rendered_html u {
+  text-decoration: underline;
+}
+.rendered_html h1 {
+  font-size: 185.7%;
+  margin: 1.08em 0 0 0;
+  font-weight: bold;
+  line-height: 1.0;
+}
+.rendered_html h2 {
+  font-size: 157.1%;
+  margin: 1.27em 0 0 0;
+  font-weight: bold;
+  line-height: 1.0;
+}
+.rendered_html h3 {
+  font-size: 128.6%;
+  margin: 1.55em 0 0 0;
+  font-weight: bold;
+  line-height: 1.0;
+}
+.rendered_html h4 {
+  font-size: 100%;
+  margin: 2em 0 0 0;
+  font-weight: bold;
+  line-height: 1.0;
+}
+.rendered_html h5 {
+  font-size: 100%;
+  margin: 2em 0 0 0;
+  font-weight: bold;
+  line-height: 1.0;
+  font-style: italic;
+}
+.rendered_html h6 {
+  font-size: 100%;
+  margin: 2em 0 0 0;
+  font-weight: bold;
+  line-height: 1.0;
+  font-style: italic;
+}
+.rendered_html ul {
+  list-style: disc;
+  margin: 0em 2em;
+  padding-left: 0px;
+}
+.rendered_html ul ul {
+  list-style: square;
+  margin: 0em 2em;
+}
+.rendered_html ul ul ul {
+  list-style: circle;
+  margin: 0em 2em;
+}
+.rendered_html ol {
+  list-style: decimal;
+  margin: 0em 2em;
+  padding-left: 0px;
+}
+.rendered_html ol ol {
+  list-style: upper-alpha;
+  margin: 0em 2em;
+}
+.rendered_html ol ol ol {
+  list-style: lower-alpha;
+  margin: 0em 2em;
+}
+.rendered_html ol ol ol ol {
+  list-style: lower-roman;
+  margin: 0em 2em;
+}
+.rendered_html ol ol ol ol ol {
+  list-style: decimal;
+  margin: 0em 2em;
+}
+.rendered_html hr {
+  color: black;
+  background-color: black;
+}
+.rendered_html pre {
+  margin: 1em 2em;
+}
+.rendered_html code {
+  border: 0;
+  background-color: #fff;
+  color: #000;
+  font-size: 100%;
+  padding: 0px;
+}
+.rendered_html blockquote {
+  margin: 1em 2em;
+}
+.rendered_html table {
+  margin-left: auto;
+  margin-right: auto;
+  border: 1px solid black;
+  border-collapse: collapse;
+}
+.rendered_html tr {
+  border: 1px solid black;
+  border-collapse: collapse;
+  margin: 1em 2em;
+}
+.rendered_html td {
+  border: 1px solid black;
+  border-collapse: collapse;
+  margin: 1em 2em;
+}
+.rendered_html th {
+  text-align: left;
+  vertical-align: middle;
+  padding: 4px;
+}
+.rendered_html th {
+  font-weight: bold;
+}
+.rendered_html p {
+  text-align: left;
+}
+.rendered_html img {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+}
+.rendered_html svg {
+  max-width: 100%;
+  height: auto;
+}
+.rendered_html svg.unconfined {
+  max-width: none;
+}
+.rendered_html {
+  overflow-x: auto;
+  overflow-y: hidden;
+}
+.rendered_html table,.rendered_html tr,.rendered_html th,.rendered_html td{border:1px solid black;border-collapse:collapse;margin:1em 2em;}
+.rendered_html td,.rendered_html th{text-align:left;vertical-align:middle;padding:4px;}
+
+/* Mobile
+**************************************/
+@media only screen and (max-width: 769px) {
+	nav { position: relative; }
+	.navbar ul li { line-height: 0; }
+
+	.navbar-brand {
+		float: none;
+	}
+	#logo { float: none; }
+	.navbar-brand h1 {
+		float: none;
+		margin: 0 0 0 0;
+	}
+	.navbar-brand ul { text-align: center; }
+
+	.navbar-links {
+		float: none;
+		margin-left: auto;
+		margin-right: auto;
+		padding: 0 0 0 0;
+	}
+	.navbar-links ul { text-align: center; }
+	.navbar-links ul li { margin: 5px 10px 0 10px; }
+
+  #content {
+    float: none;
+    margin-top: auto;
+  }
+
+  #content img {
+		max-width: 85%;
+		display: block;
+		margin-left: auto;
+		margin-right: auto;
+	}
+
+	.article-title {
+		text-align: center;
+		float: none !important;
+	}
+
+	.article-date {
+		text-align: center;
+		float: none !important;
+	}
+
+	#mc_embed_signup { width: 100%; }
+	#mc_embed_signup input.button { width: 50%; }
+}

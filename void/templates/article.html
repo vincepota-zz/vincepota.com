@@ -1,0 +1,87 @@
+{% extends 'base.html' %}
+{% block title %}{{ article.title }}{% endblock %}
+{% block metadesc %}{{ article.description|e }}{% endblock %}
+{% block affiliate %}{{ article.affiliate_link|safe }}{% endblock %}
+
+{% block header %}
+<!-- Extra Header for IPython Notebooks
+================================================== -->
+  {% if EXTRA_HEADER %}
+    {{ EXTRA_HEADER }}
+  {% endif %}
+{% endblock %}
+
+{% block twittercards %}
+	<!-- Facebook Open Graph
+  ================================================== -->
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="{{ article.title }}">
+  <meta property="og:url" content="{{ SITEURL }}/{{ article.url }}">
+  <meta property="og:description" content="{{ article.description|e }}">
+  <meta property="og:site_name" content="{{ SITENAME }}">
+  <meta property="og:image" content="{{ SITEURL }}{{ AVATAR }}">
+
+  <!-- Twitter Cards
+  ================================================== -->
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:site" content="@{{ TWITTER_NAME }}">
+  <meta name="twitter:creator" content="@{{ TWITTER_NAME }}">
+  <meta name="twitter:domain" content="{{ DOMAIN }}">
+  <meta name="twitter:image" content="{{ SITEURL }}{{ LOGO_IMAGE }}">
+  <meta name="twitter:title" content="{{ article.title }}">
+  <meta name="twitter:description" content="{{ article.description|e }}">
+{% endblock %}
+
+{% block content %}
+
+  <!-- Article Headers
+  ================================================================== -->
+  <h1 class="article-title"><a href="/{{ article.url }}" title="Permalink to {{ article.title }}">{{article.title}}</a></h1>
+  <h5 class="article-date">{{ article.date|strftime('%B %d, %Y') }}
+    {% if article.tags %} | Tags: {% for tag in article.tags %}
+        <a class="tag" href="/{{ tag.url }}" rel="tag" title="Posts tagged with {{ article.tag }}">{{ tag }}</a>
+      {% endfor %}
+    {% endif %}
+  </h5>
+  <hr class="small"></hr>
+
+  <!-- Article Content
+  ================================================================== -->
+  <div class="article-content">
+    {{ article.content }}
+  </div>
+
+  <hr class="small"></hr>
+  <div class="article-sharing">
+      <ul>
+      {% if TWITTER_NAME %}
+      <!-- Twitter Sharing
+      ================================================================== -->
+      <li><a href="https://twitter.com/share" class="twitter-share-button" data-via="{{ TWITTER_NAME }}">Tweet</a></li>
+      {% endif %}
+
+      {% if FACEBOOK_SHARE %}
+      <!-- Facebook Sharing
+      ================================================================== -->
+      <li><div class="fb-share-button"
+          data-href="{{ SITEURL }}/{{ article.url }}"
+          data-layout="button_count">
+      </div></li>
+      {% endif %}
+
+      {% if HACKER_NEWS_SHARE %}
+      <!-- Hacker NewsSharing
+      ================================================================== -->
+      <li><a href="https://news.ycombinator.com/submit" class="hn-button" data-count="horizontal">Vote on Hacker News</a></li>
+      {% endif %}
+      </ul>
+    </div>
+
+    <!-- Back to home
+    ================================================================== -->
+    <div class="back-to-home">
+      <a href="/">← Back to Home</a>
+    </div>
+    <hr class="small"></hr>
+  </div>
+{% endblock %}
