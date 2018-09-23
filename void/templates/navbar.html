@@ -31,7 +31,7 @@
   <div class="navbar-links">
       <ul>
         {% for page in pages %}
-            {%if page.title == 'Astronomy'%}
+            {%if page.title != 'About'%}
                 <li><a href="{{ SITEURL }}/{{ page.url }}">{{ page.title }}</a></li>
             {% endif%}
          {% endfor %}

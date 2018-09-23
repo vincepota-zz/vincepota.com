@@ -17,8 +17,8 @@ SSH_USER=root
 SSH_TARGET_DIR=/var/www
 
 DROPBOX_DIR=~/Dropbox/Public/
-S3BUCKET=s3://www.gregreda.com/
-s3cfg=~/.s3cfg
+S3BUCKET=
+s3cfg=
 
 help:
 	@echo 'Makefile for a pelican Web site                                        '

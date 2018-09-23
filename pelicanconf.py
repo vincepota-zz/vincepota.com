@@ -13,8 +13,9 @@ THEME = 'void/'
 #LOGO_IMAGE = '/images/logo.jpg'
 COPYRIGHT_START_YEAR = 2013
 NAVIGATION = [
-    {'site': 'github', 'user': 'gjreda', 'url': 'https://github.com/vincepota'},
-    {'site': 'linkedin', 'user': 'gjreda', 'url': 'https://www.linkedin.com/in/vincepota/'},
+    {'site': 'github', 'user': 'vincepota', 'url': 'https://github.com/vincepota'},
+    {'site': 'linkedin', 'user': 'vincepota', 'url': 'https://www.linkedin.com/in/vincepota/'},
+    {'site': 'stack-overflow', 'user': 'vincepota', 'url': 'https://stackoverflow.com/users/5497294/vincep/'}
 ]
 
 # ARTICLE_URL = '{date:%Y}/{date:%m}/{date:%d}/{slug}/'
@@ -58,7 +59,7 @@ FACEBOOK_SHARE = False
 HACKER_NEWS_SHARE = False
 
 #### Analytics
-GOOGLE_ANALYTICS = 'UA-34295039-1'
+GOOGLE_ANALYTICS = 'UA-124125850-1'
 DOMAIN = "vincepota.com"
 
 # Other
