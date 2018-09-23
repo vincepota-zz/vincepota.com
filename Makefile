@@ -9,7 +9,7 @@ PUBLISHCONF=$(BASEDIR)/publishconf.py
 
 FTP_HOST=localhost
 FTP_USER=anonymous
-FTP_TARGET_DIR=/
+FTP_TARGET_DIR=/public_html
 
 SSH_HOST=localhost
 SSH_PORT=22
@@ -70,7 +70,7 @@ dropbox_upload: publish
 	cp -r $(OUTPUTDIR)/* $(DROPBOX_DIR)
 
 ftp_upload: publish
-	lftp ftp://$(FTP_USER)@$(FTP_HOST) -e "mirror -R $(OUTPUTDIR) $(FTP_TARGET_DIR) ; quit"
+	lftp -c "set ftp:ssl-force true; set ftp:ssl-protect-data true; set ssl:verify-certificate false; open ftp://$(FTP_USER)@$(FTP_HOST); mirror -R $(OUTPUTDIR) $(FTP_TARGET_DIR) ; quit"
 
 github: publish
 	ghp-import $(OUTPUTDIR)
