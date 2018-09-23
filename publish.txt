@@ -1,1 +1,0 @@
-lftp -c "set ftp:ssl-force true; set ftp:ssl-protect-data true; set ssl:verify-certificate false; open ftp://vinczvdj@104.219.248.115:21; mirror -R output public_html ; quit"
