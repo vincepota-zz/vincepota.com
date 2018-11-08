@@ -45,6 +45,8 @@ MARKUP = ('md', 'ipynb')
 PLUGIN_PATHS = ['pelican-plugins', 'pelican_dynamic']
 PLUGINS = ['assets', 'pelican-ipynb.liquid', 'pelican_dynamic']
 
+DISQUS_SITENAME = 'vincepota'
+
 CODE_DIR = 'code'
 NOTEBOOK_DIR = 'notebooks'
 # EXTRA_HEADER = open('_nb_header.html').read().decode('utf-8')
