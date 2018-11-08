@@ -76,7 +76,5 @@ github: publish
 	ghp-import $(OUTPUTDIR)
 	git push origin gh-pages
 
-s3: publish
-	s3cmd -c $(s3cfg) -r put $(OUTPUTDIR)/* $(S3BUCKET)
 
 .PHONY: html help clean regenerate serve devserver publish ssh_upload rsync_upload dropbox_upload ftp_upload github s3

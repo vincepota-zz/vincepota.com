@@ -60,7 +60,7 @@ HACKER_NEWS_SHARE = False
 
 #### Analytics
 GOOGLE_ANALYTICS = 'UA-124125850-1'
-DOMAIN = "vincepota.com"
+#DOMAIN = "www.vincepota.com"
 
 # Other
 MAILCHIMP = False
