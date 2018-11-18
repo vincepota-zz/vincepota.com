@@ -1,7 +1,7 @@
 Title: Analysis of London spending with python
 Date: 2016-08-07 10:20
 Category: Data Science
-Tags: mafia, web-scrap, beautifulsoup, python
+Tags: London, GLA, web-scrap, beautifulsoup, python
 
 In this post I want to discuss how you can use python to fetch data from the internet,put them in a readable format and gain some interesting insights.
 

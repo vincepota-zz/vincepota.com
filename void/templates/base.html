@@ -1,5 +1,6 @@
 <!DOCTYPE html>
-<html lang="en">
+{% block html %}
+<html lang="{{ DEFAULT_LANG }}">
 <head>
 
   {% block header %}{% endblock %}
@@ -7,17 +8,18 @@
 	<!-- Basic Page Needs
   ================================================== -->
   <meta charset="utf-8">
-  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
 
   <title>{% block title %}{% endblock %}</title>
 
   <meta name="description" content="{% block metadesc %}{% endblock %}">
+  <meta name="tags" content="{% block tags %}{% endblock %}">
   <meta name="author" content="{{ AUTHOR }}">
   <meta name="copyright" content="&copy; Copyright {{ SITENAME }}, {{ COPYRIGHT_START_YEAR }} to Present">
-
+  <meta name="google-site-verification" content="Evq1nc62PaO8t3wvem-MvnOM7ktmo5DVm9qsvCkjZd0" >
   <!-- Mobile Specific Metas
   ================================================== -->
-  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=0">
 
   <!-- Fonts
   ================================================== -->
@@ -40,20 +42,6 @@
   {% block twittercards %}{% endblock %}
   {% endif %}
 
-	<!--[if lt IE 9]>
-		<script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
-	<![endif]-->
-
-  {% if article %}
-    {% if article.styles %}
-  <!-- Pelican Dynamic - for embedding D3 charts
-  =================================================== -->
-        {% for style in article.styles %}
-  {{ style }}
-          {% endfor %}
-      {% endif %}
-  {% endif %}
-
 	<!-- Favicons
 	================================================== -->
 	<link rel="shortcut icon" href="{{ FAVICON_IMAGE }}">
@@ -63,7 +51,7 @@
 
 </head>
 <body>
-	<!-- Primary Page Layout
+	<!-- The actual webpage
 	================================================== -->
 	<div class="container">
     {% include 'navbar.html' %}
@@ -71,7 +59,10 @@
 			{% block content %}{% endblock %}
 		</section>
 		{% include 'footer.html' %}
-	</div><!-- container -->
+	</div>
+
+  <!-- Scripts 
+	================================================== -->
 
 	{% include "analytics.html" %}
 
@@ -122,14 +113,3 @@
 ==================================================================== -->
 <script type="text/javascript">var HN=[];HN.factory=function(e){return function(){HN.push([e].concat(Array.prototype.slice.call(arguments,0)))};},HN.on=HN.factory("on"),HN.once=HN.factory("once"),HN.off=HN.factory("off"),HN.emit=HN.factory("emit"),HN.load=function(){var e="hn-button.js";if(document.getElementById(e))return;var t=document.createElement("script");t.id=e,t.src="//hn-button.herokuapp.com/hn-button.js";var n=document.getElementsByTagName("script")[0];n.parentNode.insertBefore(t,n)},HN.load();</script>
 {% endif %}
-
-{% if article %}
-    {% if article.scripts %}
-<!-- Pelican Dynamic - for embedding D3 charts
-=================================================== -->
-        {% for script in article.scripts %}
-{{ script }}
-        {% endfor %}
-    {% endif %}
-{% endif %}
-</html>

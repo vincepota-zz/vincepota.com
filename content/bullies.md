@@ -1,7 +1,7 @@
 Title: When bullies kill by mistake
 Date: 2017-07-17 10:20
 Category: Data Science
-Tags: mafia, web-scrap, beautifulsoup python
+Tags: mafia, web-scrap, beautifulsoup, python
 
 I am Italian. Although I left Italy almost ten years ago, I still feel very attached to my country, my people and my culture. Unfortunately, Italy is not pizza and mandolino. In the last century, Italy has been tormented by a series of unfortunate events: fascism, corruption in the public sector, the financial crisis, Berlusconi. But there is one phenomenon (a combination of all of above) which still rules them all.  It has been spreading and rooting like a cancer for 150 years: mafia.
 

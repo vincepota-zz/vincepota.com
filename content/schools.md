@@ -1,33 +1,37 @@
 Title: La scuola italiana: cosa dicono gli open data [Italian]
-Date: 2018-08-07 10:20
+Date: 2018-11-10 10:20
 Category: Data Science
 Tags: school, data-mining, python, plotly, maps
-
-## Premessa
+Slug: schools
+Description: Analisi degli open data della scuola italiana (MIUR) con python
+Lang: it_IT
 
 Gli open data (i “dati aperti”), cioè quelli liberamente accessibili a chiunque attraverso la
-rete, sono una straordinaria risorsa per la società in cui viviamo in quanto danno agli individui
-il potere di ottenere informazioni direttamente dalla fonte, senza filtri e senza preconcetti. Per far ciò, è ovviamente richiesta
-un pò di dimestichezza con l'informatica e la programmazione, ma entrambi sono diventati molti più accessibili rispetto a 20 anni fa.
-Per dimostrarlo, in seguito analizzerò gli open data della scuola italiana utilizzando semplici tecniche di esplorazione dati.
+rete, sono una straordinaria risorsa per la società in cui viviamo, in quanto danno agli individui
+il potere di ottenere informazioni direttamente dalla fonte, senza filtri e senza preconcetti. Per maneggiare dati, è
+ovviamente richiesta un minimo di dimestichezza con l'informatica e la programmazione, ma entrambi sono diventati molti più
+accessibili negli ultimi 10 anni. In seguito analizzerò gli open data della scuola italiana utilizzando semplici tecniche di
+esplorazione dati.
 
 Faccio questo per una serie di motivi:
 
-- Il dataset è promettente e ben compilato, con variabili che permetteranno di avere un’istantanea del sistema scuola.
+- Il dataset è promettente e ben compilato, con variabili che permettono di avere un’istantanea del sistema scuola.
 - Non ho trovato alcuna analisi panoramica di questo dataset. Alcuni giornali hanno pubblicato solo analisi specifiche su alcune sezioni dei dati.
-- Spero che i dati ci svelino cose che non sapevamo prima.
-- Voglio dimostrare il potenziale del metodo scientifico applicato ai dati ed anche di come questa combinazione possa darci informazioni interessanti.
+- Spero che i dati ci svelino cose che prima non conoscevamo.
 
 Tutto il codice sorgente è open source, cioè accessibile a tutti, ed è pubblicato [qui](https://github.com/vincepota/school-me).
-Gran parte dell’analisi verrà fatta con il linguaggio python. Se avete un po di dimestichezza
-con questo linguaggio vi incoraggio a contribuire a questo codice.
+Gran parte dell’analisi verrà fatta con il linguaggio di programmazione python.
+Se avete un po di dimestichezza con questo linguaggio vi incoraggio a contribuire a questo codice.
+Tutti i grafici di questo articolo sono interattivi, potete zoommare, selezionare e sorvolare sui punti per
+avere ulteriori informazioni sui dati.
 
 ## I dati
 
-I dati vengono da [questo sito](http://dati.istruzione.it/opendata/opendata/). Non so come siano stati compilati o chi li abbia compilati.
+I dati vengono da [questo sito](http://dati.istruzione.it/opendata/opendata/).
+Non so come siano stati compilati o chi li abbia compilati.
 Assumo che siano corretti e completi, cercando di correggerli nel caso in cui non lo siano.
 
-I dati sono nelle seguenti categorie:
+I dati sono divisi in diversi files di testo in formato _csv_ nelle seguenti categorie:
 
 - __Anagrafica__: nome scuola, indirizzo scuola, tipologia scuola, etc.
 - __Docenti__: età, tipologia (supplente, di ruolo), sesso, etc.
@@ -35,16 +39,15 @@ I dati sono nelle seguenti categorie:
 - __Studenti__: età, sesso, nazionalità, etc.
 
 Queste categorie compongono quattro datasets indipendenti che però possono essere uniti
-utilizzando le informazioni che hanno in comune. Ho raggruppato tutti i dati in una banca dati (SQL database) che potete scaricare [qui](https://github.com/vincepota/school-me/blob/master/IT_schools.db).
+utilizzando le informazioni che hanno in comune. Ho raggruppato tutti i dati in una banca dati (SQLlite database) che potete scaricare [qui](https://github.com/vincepota/school-me/blob/master/IT_schools.db).
 
 I dati si riferiscono all’anno scolastico 2016/17. Includono sia scuole pubbliche che
-paritarie (private) che siano: dell’infanzia (materne), primaria (elementari),
-secondaria I grado (medie), secondaria II grado (superiori). Questo non è vero per tutte
-le categorie. Ad esempio non ci sono informazioni per studenti delle scuole
+paritarie (private) che siano: dell’infanzia (materne), primarie (elementari),
+secondarie I grado (medie), secondarie II grado (superiori). Non di tutte le scuole abbiamo la stessa tipologia di dati, ad esempio non ci sono informazioni per studenti delle scuole
 dell’infanzia.
 
 Come supplemento alla mia analisi, utilizzerò dati demografici ISTAT relativi al 1 Gennaio 2017
-contenenti la popolazione legale al 09/10/2011, cioè’ la data dell’ultimo censimento,
+contenenti la popolazione legale al 09/10/2011, cioè la data dell’ultimo censimento,
 per comune, provincia, regione e ripartizione geografica.
 
 ## Studenti: quanti sono e da dove vengono
@@ -80,8 +83,8 @@ Cioè non ci sono le scuole dell’infanzia.
 | VENETO            | 577,645  | 506,117   | 71,528        | 15,397 | 56,131  | 87.6%              | 12.4%               | 21.5%               | 78.5%               |
 
 
-Tra le varie informazioni contenute in questa tabella, uno ha attratto la mia attenzione.
-Ci sono nettamente più studenti stranieri relative agli studenti italiani nelle regioni del nord.
+Tra le varie informazioni contenute in questa tabella, una ha attratto la mia attenzione:
+ci sono nettamente più studenti stranieri relativi agli studenti italiani nelle regioni del nord.
 Questo dato è in perfetto accordo con i [dati demografici della popolazione residente](https://www.tuttitalia.it/statistiche/cittadini-stranieri-2017/)
 che mostrano che i residenti stranieri aumentano andando verso nord.
 La divisione tra nord e sud è evidente quando visualizziamo i dati su una mappa.
@@ -89,15 +92,15 @@ La mappa è interattiva. Sorvola sulle regioni per avere ulteriori informazioni.
 
 <iframe width="900" height="800" frameborder="0" scrolling="no" src="//plot.ly/~vincenzo.pota/6.embed"></iframe>
 
-L’ Emilia Romagna è la regione con più la più alta frazione di studenti stranieri,
+
+L’ Emilia Romagna è la regione con la più alta frazione di studenti stranieri,
 mentre la Campania è la regione con meno studenti stranieri relativi agli studenti
 Italiani. In totale, poco più di mezzo milione di studenti (645,122) sono di nazionalità non Italiana.
 
-Di tutti gli studenti stranieri, che percentuale è proveniente da paesi dell'Unione Europea e paesi extra europei?
+Di tutti gli studenti stranieri, qual e' la percentuale proveniente da paesi dell'Unione Europea e paesi extra europei?
 
-<iframe width="700" height="600" frameborder="0" scrolling="no" src="//plot.ly/~vincenzo.pota/22.embed"></iframe>
-
-<iframe width="700" height="600" frameborder="0" scrolling="no" src="//plot.ly/~vincenzo.pota/20.embed"></iframe>
+<iframe width="900" height="800" frameborder="0" scrolling="no" src="//plot.ly/~vincenzo.pota/22.embed"></iframe>
+<iframe width="900" height="800" frameborder="0" scrolling="no" src="//plot.ly/~vincenzo.pota/20.embed"></iframe>
 
 Qui vediamo qualcosa di molto interessante: gli studenti Europei sono più numerosi al
 sud, mentre gli studenti extra-europei sono più numerosi al nord. Questo è
@@ -115,12 +118,14 @@ Vediamo ora quante scuole ci sono in ogni città. Per "scuola", qui si intende l
 istituzionale e non l'edificio fisico. Ho correlato i dati aggregati ISTAT, che mi
 danno il numero di residenti per ogni provincia, con gli open data del ministero, che mi
 dicono quante scuole ci sono in ogni provincia. Il grafico qui sotto mostra questa
-correlazione.
+correlazione. Sorvolando sui punti si può vedere il nome della provincia ed altre informazioni.
 
 <iframe width="900" height="600" frameborder="0" scrolling="no" src="//plot.ly/~vincenzo.pota/10.embed"></iframe>
 
-Come ci aspettiamo, più una provincia é popolosa, più scuole ci sono. La linea
-tratteggiata è il modello matematico lineare che meglio rappresenta questa correlazione.
+Come ci aspettiamo, più una provincia é popolosa, più scuole ci sono.
+I due estremi sono Roma, che ha quasi 4 milioni di abitanti e circa 1,800 scuole, ed Isernia
+con 80,000 abitanti e 75 scuole.
+La linea tratteggiata è il modello matematico lineare che meglio rappresenta questa correlazione.
 In media, c'é una scuola ogni 1,750 abitanti. Il più basso rapporto scuola per
 popolazione va alla provincia di Vibo Valentia con una scuola ogni 950 abitanti; il più
 alto rapporto va a Barletta-Andria-Trani con una scuola ogni 2,800 abitanti.
@@ -130,7 +135,7 @@ Per giudicare se ci sono abbastanza scuole per provincia, si dovrebbe confrontar
 numero di scuole con la popolazione giovane (dai 6 ai 18 anni circa), cosa che qui non
 ho fatto.
 
-## Docenti: sono vecchi o giovani?
+## Docenti: sono anziani o giovani?
 
 Analizziamo ora l'età dei docenti delle scuole Italiane. Questo include docenti sia
 ordinari che supplenti. La tabella mostra quanti docenti ci sono per quattro fasce d'età
@@ -149,8 +154,8 @@ dato è ancora più allarmante se inquadrato in un contesto mondiale come fatto
 dall'Università di Cambridge [in uno studio del 2016](http://www.cambridgeassessment.org.uk/our-research/data-bytes/the-average-age-of-teachers-in-secondary-schools/).
 Questo studio ha trovato che l'Italia è la nazione con i docenti più vecchi in un campione di 36
 nazioni (che include nazioni da tutto il mondo come Malesia, Israele, Romania e Brasile).
-I docenti giovani under 34 sono solo il 6.6% di tutti i docenti Italiani.
-Dipingete nella vostra testa cosa vuol dire: se estraete a caso 100 docenti da tutte le scuole d'Italia, soltanto (circa) 7 avranno meno di 34 anni.
+__I docenti giovani under 34 sono solo il 6.6% di tutti i docenti Italiani.__
+Dipingete nella vostra testa cosa vuol dire questo dato: se estraete a caso 100 docenti da tutte le scuole d'Italia, soltanto (circa) 7 avranno meno di 34 anni.
 
 Il grafico qui sotto mostra come l' età dei docenti è distribuita per tipologia di scuola.
 
@@ -165,9 +170,9 @@ superiori per insegnare a studenti meno energetici.
 Abbiamo visto che il corpo docenti nazionale è anziano, ma qualche under 34 c'è. Vediamo
 quindi qual'è la provincia con i docenti più giovani d'Italia. Cioè, per ogni provincia
 calcoliamo la percentuale degli under 34 rispetto a tutti i docenti in quella provincia.
-Un colore più verde vuol dire più docenti giovani.
+Un verde piu' scuro vuol dire più docenti giovani.
 
-<iframe width="900" height="800" frameborder="0" scrolling="no" src="//plot.ly/~vincenzo.pota/14.embed"></iframe>
+<iframe width="800" height="800" frameborder="0" scrolling="no" src="//plot.ly/~vincenzo.pota/14.embed"></iframe>
 
 È chiaro che il nord ovest è l'area con più docenti under 34. La prima provincia è Cuneo
 con il 12.6% (il doppio rispetto alla media nazionale), seguita da Verbano-Cusio-Ossola
@@ -178,31 +183,31 @@ Vediamo, purtroppo, la stessa separazione geografica nord-sud che abbiamo incont
 sopra. Al sud i docenti giovani sono pochi, pochissimi. Sono tra il 2%-3%, con ai due
 estremi Siracusa (1.9%) e Barletta-Andria-Trani (5.4%).
 
-## Edifici scolastici: come sono e quante sono a norma ?
+## Edifici scolastici: come sono e quanti sono a norma ?
 
 Occupiamoci ora degli edifici scolastici. Questo
-dataset contiene dati solo per le scuole pubbliche: anno di costruzione, il grado
+dataset contiene dati solo per le scuole pubbliche: l' anno di costruzione, il grado
 di accessibilità, se hanno palestra e piscina, mensa, il volume, etc. Purtroppo, questo
 dataset è "incompleto", cioè mancano dati. Come lo so? Per iniziare, il dataset
 non contiene nessuna scuola del mio paese di origine: Casagiove. Dai dati ho calcolato
 che mancano all'appello edifici da 866 comuni. Un' analisi rigorosa richiederebbe una
 correzione per questo effetto di incompletezza, cosa che io non farò.
 
-Visualizziamo qualche risultato interessante: come sono distribuiti l'anno di costruzione, la superficie in metri quadrati e il numero di piani per ogni scuola.
+Visualizziamo qualche risultato interessante: come sono distribuiti l'anno di costruzione,
+la superficie in metri quadrati e il numero di piani per ogni scuola.
 
 <iframe width="900" height="500" frameborder="0" scrolling="no" src="//plot.ly/~vincenzo.pota/16.embed"></iframe>
 
-Il primo grafico mostra che la maggior parte degli edifici scolastici è stata costruita
-nel dopoguerra ma il picco si é raggiunto negli anni 70 fino a metà degli anni 80. Un
+Il primo grafico sulla sinistra mostra che la maggior parte degli edifici scolastici sono stati costruiti
+nel dopoguerra, ma il picco si é raggiunto negli anni 70 fino a metà degli anni 80. Un
 tipico edificio scolastico tende ad avere 2 piani, con una superficie totale di circa
 7,000 metri quadrati.
 
-Cosa molto più interessante è l'analisi della resistenza sismica degli edifici scolastici.
-Cioè: quanti edifici sono stati progettati con criteri antisismici?
-Prima di mostrare i risultati va fatta un' importante precisazione. I dati
+Cosa molto più interessante è l'analisi della resistenza sismica degli edifici scolastici,
+cioè: quanti edifici sono stati progettati con criteri antisismici?
+Prima di mostrare i risultati va fatta un' importante precisazione: i dati
 ci dicono solo se un edificio è stato progettato e costruito con criteri antisismici, ma non ci dicono se
-è stato adeguato successivamente. Vedi [questa risposta del
-ministero](http://precisoche.blogautore.espresso.repubblica.it/2017/06/05/scuole-e-sicurezza-la-replica-del-miur-e-la-nostra-risposta/) ad un'[articolo dell'espresso](http://precisoche.blogautore.espresso.repubblica.it/2017/06/05/scuole-e-sicurezza-la-replica-del-miur-e-la-nostra-risposta/).
+è stato adeguato successivamente. Questo è spiegato in [questa risposta del Ministero](http://precisoche.blogautore.espresso.repubblica.it/2017/06/05/scuole-e-sicurezza-la-replica-del-miur-e-la-nostra-risposta/) ad un'[articolo dell'Espresso](http://precisoche.blogautore.espresso.repubblica.it/2017/06/05/scuole-e-sicurezza-la-replica-del-miur-e-la-nostra-risposta/).
 Ad esempio, se un edificio è stato costruito nel 1960 senza criteri antisismici ed è stato reso
 antisismico nel 1980, questo edificio apparirà come "non a norma" nei dati.
 
@@ -213,36 +218,36 @@ Ecco i risultati:
 La figura mostra il numero di edifici scolastici progettati con criteri antisismici (a
 norma in arancione) o senza criteri antisismici (non a norma in blu) per quattro
 diverse fasce di rischio sismico legate alla collocazione geografica della scuola. Ad
-esempio, una scuola a l'Aquila è ad alto rischio sismico, mentre una scuola a Torino
+esempio, una scuola a L'Aquila è ad alto rischio sismico, mentre una scuola a Torino
 non ha rischio sismico.
 
 Il dataset contiene 36,093 edifici scolastici, di cui 4,145 (11%) sono stati costruiti a
 norma, 31,662 (87%) non sono stati costruiti a norma, e 286 non hanno questa
 informazione. Tuttavia, si potrebbe sostenere che edifici scolastici non a norma
-costruiti in zone a bassa o assente sismicità (come il Piemonte e la Liguria) siano meno
+costruiti in zone a bassa o assente sismicità (come il Piemonte e la Puglia) siano meno
 pericolosi degli edifici non a norma costruiti in regioni ad alto rischio sismico (come
 l'Abruzzo o la Calabria).
 
 Quindi, se consideriamo solo scuole a medio o alto rischio sismico troviamo un totale
 di 15,194 scuole di cui 12,184 (80%) non sono a norma e 3,010 (20%) sono a norma. Questi numeri
-sono leggermente più rassicuranti di quelli relativi all'intera popolazione; ancor più se
+sono leggermente più rassicuranti di quelli relativi a tutti gli edifici; ancor più se
 consideriamo che un numero imprecisato di questi edifici é successivamente stato
 adeguato con criteri antisismici.
 
-# Conclusione
+## Conclusione
 
-I dati delle scuole italiane compilati dal ministero dell'istruzione sono una preziosa
+I dati delle scuole italiane compilati dal Ministero dell' Istruzione sono una preziosa
 risorsa per avere un'istantanea del sistema scolastico italiano. In questo articolo ho
 presentato solo alcuni del moltissimi risultati che si possono ottenere da questi dati.  
 
-Un dataset del genere può essere utile a Regioni, Provincie e comuni per inquadrare le
+Un dataset del genere può essere utile a Regioni, Province e comuni per inquadrare le
 loro scuole in un contesto nazionale. Oppure può essere utile a giornalisti e semplici
 cittadini per trasformare i numeri in storie che possano essere divulgate ad un pubblico
 non esperto. Un'analisi del genere non richiede né una laurea in statistica, né un
 master in informatica. Avete bisogno solo di due importanti requisiti:
 
-1. Abbastanza curiosità per trasformare migliaia di numeri senza senso in risultati interessanti.
-2. Un minimo di dimestichezza con linguaggi di programmazione e manipolazione di dati.
+- Abbastanza curiosità per trasformare migliaia di numeri senza senso in risultati interessanti.
+- Un minimo di dimestichezza con linguaggi di programmazione e manipolazione di dati.
 
 Se avete i due requisiti di sopra, vi incoraggio ad esplorare il mondo degli open data ed a
 condividere le vostre scoperte con la comunità.

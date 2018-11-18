@@ -3,10 +3,10 @@
 
 AUTHOR = u'Vince Pota'
 SITENAME = u'vincepota.com'
-#SITEURL = 'http://www.vincepota.com'
+SITEURL = 'http://www.vincepota.com'
 TIMEZONE = 'Etc/Greenwich'
 TITLE = "A data science blog."
-DESCRIPTION = ""
+DESCRIPTION = "A wesbiste about data science, data and nice looking visualisations"
 
 # Variables for theme
 THEME = 'void/'
@@ -33,6 +33,7 @@ DEFAULT_CATEGORY = 'misc'
 DEFAULT_DATE = 'fs'
 DEFAULT_DATE_FORMAT = '%b %d, %Y'
 DEFAULT_PAGINATION = False
+# LOCALE = ('en', 'it_IT', 'it')
 
 # FEEDS
 FEED_ALL_ATOM = "feeds/all.atom.xml"
