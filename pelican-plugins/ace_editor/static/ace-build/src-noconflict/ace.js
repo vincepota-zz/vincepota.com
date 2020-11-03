@@ -173,7 +173,7 @@ exportAce(ACE_NAMESPACE);
 
 })();
 
-ace.define("ace/lib/regexp",["require","exports","module"], function(require, exports, module) {
+ace.define("ace/lib/regexp",[], function(require, exports, module) {
 "use strict";
     var real = {
             exec: RegExp.prototype.exec,
@@ -244,7 +244,7 @@ ace.define("ace/lib/regexp",["require","exports","module"], function(require, ex
 
 });
 
-ace.define("ace/lib/es5-shim",["require","exports","module"], function(require, exports, module) {
+ace.define("ace/lib/es5-shim",[], function(require, exports, module) {
 
 //
 //
@@ -957,81 +957,17 @@ var toObject = function (o) {
 
 });
 
-ace.define("ace/lib/fixoldbrowsers",["require","exports","module","ace/lib/regexp","ace/lib/es5-shim"], function(require, exports, module) {
+ace.define("ace/lib/fixoldbrowsers",[], function(require, exports, module) {
 "use strict";
 
 require("./regexp");
 require("./es5-shim");
-if (typeof Element != "undefined" && !Element.prototype.remove) {
-    Object.defineProperty(Element.prototype, "remove", {
-        enumerable: false,
-        writable: true,
-        configurable: true,
-        value: function() { this.parentNode && this.parentNode.removeChild(this); }
-    });
-}
-
 
 });
 
-ace.define("ace/lib/useragent",["require","exports","module"], function(require, exports, module) {
-"use strict";
-exports.OS = {
-    LINUX: "LINUX",
-    MAC: "MAC",
-    WINDOWS: "WINDOWS"
-};
-exports.getOS = function() {
-    if (exports.isMac) {
-        return exports.OS.MAC;
-    } else if (exports.isLinux) {
-        return exports.OS.LINUX;
-    } else {
-        return exports.OS.WINDOWS;
-    }
-};
-if (typeof navigator != "object")
-    return;
-
-var os = (navigator.platform.match(/mac|win|linux/i) || ["other"])[0].toLowerCase();
-var ua = navigator.userAgent;
-exports.isWin = (os == "win");
-exports.isMac = (os == "mac");
-exports.isLinux = (os == "linux");
-exports.isIE = 
-    (navigator.appName == "Microsoft Internet Explorer" || navigator.appName.indexOf("MSAppHost") >= 0)
-    ? parseFloat((ua.match(/(?:MSIE |Trident\/[0-9]+[\.0-9]+;.*rv:)([0-9]+[\.0-9]+)/)||[])[1])
-    : parseFloat((ua.match(/(?:Trident\/[0-9]+[\.0-9]+;.*rv:)([0-9]+[\.0-9]+)/)||[])[1]); // for ie
-    
-exports.isOldIE = exports.isIE && exports.isIE < 9;
-exports.isGecko = exports.isMozilla = ua.match(/ Gecko\/\d+/);
-exports.isOpera = window.opera && Object.prototype.toString.call(window.opera) == "[object Opera]";
-exports.isWebKit = parseFloat(ua.split("WebKit/")[1]) || undefined;
-
-exports.isChrome = parseFloat(ua.split(" Chrome/")[1]) || undefined;
-
-exports.isEdge = parseFloat(ua.split(" Edge/")[1]) || undefined;
-
-exports.isAIR = ua.indexOf("AdobeAIR") >= 0;
-
-exports.isIPad = ua.indexOf("iPad") >= 0;
-
-exports.isAndroid = ua.indexOf("Android") >= 0;
-
-exports.isChromeOS = ua.indexOf(" CrOS ") >= 0;
-
-exports.isIOS = /iPad|iPhone|iPod/.test(ua) && !window.MSStream;
-
-if (exports.isIOS) exports.isMac = true;
-
-exports.isMobile = exports.isIPad || exports.isAndroid;
-
-});
-
-ace.define("ace/lib/dom",["require","exports","module","ace/lib/useragent"], function(require, exports, module) {
+ace.define("ace/lib/dom",[], function(require, exports, module) {
 "use strict";
 
-var useragent = require("./useragent"); 
 var XHTML_NS = "http://www.w3.org/1999/xhtml";
 
 exports.buildDom = function buildDom(arr, parent, refs) {
@@ -1089,20 +1025,6 @@ exports.createElement = function(tag, ns) {
     return document.createElementNS ?
            document.createElementNS(ns || XHTML_NS, tag) :
            document.createElement(tag);
-};
-
-exports.removeChildren = function(element) {
-    element.innerHTML = "";
-};
-
-exports.createTextNode = function(textContent, element) {
-    var doc = element ? element.ownerDocument : document;
-    return doc.createTextNode(textContent);
-};
-
-exports.createFragment = function(element) {
-    var doc = element ? element.ownerDocument : document;
-    return doc.createDocumentFragment();
 };
 
 exports.hasCssClass = function(el, name) {
@@ -1163,7 +1085,7 @@ exports.hasCssString = function(id, doc) {
 exports.importCssString = function importCssString(cssText, id, container) {
     var root = container && container.getRootNode
         ? container.getRootNode()
-        : document;
+        : container || document;
     
     var doc = root.ownerDocument || root;
     if (id && exports.hasCssString(id, root))
@@ -1179,11 +1101,11 @@ exports.importCssString = function importCssString(cssText, id, container) {
 
     if (root == doc)
         root = exports.getDocumentHead(doc);
-    root.insertBefore(style, root.firstChild);
+    root.appendChild(style);
 };
 
 exports.importCssStylsheet = function(uri, doc) {
-    exports.buildDom(["link", {rel: "stylesheet", href: uri}], exports.getDocumentHead(doc));
+    exports.buildDom("link", {rel: "stylesheet", href: uri}, exports.getDocumentHead(doc));
 };
 exports.scrollbarWidth = function(document) {
     var inner = exports.createElement("ace_inner");
@@ -1230,41 +1152,17 @@ exports.computedStyle = function(element, style) {
     return window.getComputedStyle(element, "") || {};
 };
 
-exports.setStyle = function(styles, property, value) {
-    if (styles[property] !== value) {
-        styles[property] = value;
-    }
-};
-
 exports.HAS_CSS_ANIMATION = false;
-exports.HAS_CSS_TRANSFORMS = false;
-exports.HI_DPI = useragent.isWin
-    ? typeof window !== "undefined" && window.devicePixelRatio >= 1.5
-    : true;
-
 if (typeof document !== "undefined") {
     var div = document.createElement("div");
-    if (exports.HI_DPI && div.style.transform  !== undefined)
-        exports.HAS_CSS_TRANSFORMS = true;
-    if (!useragent.isEdge && typeof div.style.animationName !== "undefined")
-        exports.HAS_CSS_ANIMATION = true;
-    div = null;
-}
-
-if (exports.HAS_CSS_TRANSFORMS) {
-    exports.translate = function(element, tx, ty) {
-        element.style.transform = "translate(" + Math.round(tx) + "px, " + Math.round(ty) +"px)";
-    };
-} else {
-    exports.translate = function(element, tx, ty) {
-        element.style.top = Math.round(ty) + "px";
-        element.style.left = Math.round(tx) + "px";
-    };
+    if (typeof div.style.animationName !== "undefined") {
+        exports.HAS_CSS_ANIMATION = true; 
+    }
 }
 
 });
 
-ace.define("ace/lib/oop",["require","exports","module"], function(require, exports, module) {
+ace.define("ace/lib/oop",[], function(require, exports, module) {
 "use strict";
 
 exports.inherits = function(ctor, superCtor) {
@@ -1292,7 +1190,7 @@ exports.implement = function(proto, mixin) {
 
 });
 
-ace.define("ace/lib/keys",["require","exports","module","ace/lib/fixoldbrowsers","ace/lib/oop"], function(require, exports, module) {
+ace.define("ace/lib/keys",[], function(require, exports, module) {
 "use strict";
 
 require("./fixoldbrowsers");
@@ -1407,7 +1305,55 @@ exports.keyCodeToString = function(keyCode) {
 
 });
 
-ace.define("ace/lib/event",["require","exports","module","ace/lib/keys","ace/lib/useragent"], function(require, exports, module) {
+ace.define("ace/lib/useragent",[], function(require, exports, module) {
+"use strict";
+exports.OS = {
+    LINUX: "LINUX",
+    MAC: "MAC",
+    WINDOWS: "WINDOWS"
+};
+exports.getOS = function() {
+    if (exports.isMac) {
+        return exports.OS.MAC;
+    } else if (exports.isLinux) {
+        return exports.OS.LINUX;
+    } else {
+        return exports.OS.WINDOWS;
+    }
+};
+if (typeof navigator != "object")
+    return;
+
+var os = (navigator.platform.match(/mac|win|linux/i) || ["other"])[0].toLowerCase();
+var ua = navigator.userAgent;
+exports.isWin = (os == "win");
+exports.isMac = (os == "mac");
+exports.isLinux = (os == "linux");
+exports.isIE = 
+    (navigator.appName == "Microsoft Internet Explorer" || navigator.appName.indexOf("MSAppHost") >= 0)
+    ? parseFloat((ua.match(/(?:MSIE |Trident\/[0-9]+[\.0-9]+;.*rv:)([0-9]+[\.0-9]+)/)||[])[1])
+    : parseFloat((ua.match(/(?:Trident\/[0-9]+[\.0-9]+;.*rv:)([0-9]+[\.0-9]+)/)||[])[1]); // for ie
+    
+exports.isOldIE = exports.isIE && exports.isIE < 9;
+exports.isGecko = exports.isMozilla = ua.match(/ Gecko\/\d+/);
+exports.isOpera = window.opera && Object.prototype.toString.call(window.opera) == "[object Opera]";
+exports.isWebKit = parseFloat(ua.split("WebKit/")[1]) || undefined;
+
+exports.isChrome = parseFloat(ua.split(" Chrome/")[1]) || undefined;
+
+exports.isAIR = ua.indexOf("AdobeAIR") >= 0;
+
+exports.isIPad = ua.indexOf("iPad") >= 0;
+
+exports.isChromeOS = ua.indexOf(" CrOS ") >= 0;
+
+exports.isIOS = /iPad|iPhone|iPod/.test(ua) && !window.MSStream;
+
+if (exports.isIOS) exports.isMac = true;
+
+});
+
+ace.define("ace/lib/event",[], function(require, exports, module) {
 "use strict";
 
 var keys = require("./keys");
@@ -1726,17 +1672,14 @@ if (typeof window == "object" && window.postMessage && !useragent.isOldIE) {
     var postMessageId = 1;
     exports.nextTick = function(callback, win) {
         win = win || window;
-        var messageName = "zero-timeout-message-" + (postMessageId++);
-        
-        var listener = function(e) {
+        var messageName = "zero-timeout-message-" + postMessageId;
+        exports.addListener(win, "message", function listener(e) {
             if (e.data == messageName) {
                 exports.stopPropagation(e);
                 exports.removeListener(win, "message", listener);
                 callback();
             }
-        };
-        
-        exports.addListener(win, "message", listener);
+        });
         win.postMessage(messageName, "*");
     };
 }
@@ -1777,7 +1720,7 @@ else
     };
 });
 
-ace.define("ace/range",["require","exports","module"], function(require, exports, module) {
+ace.define("ace/range",[], function(require, exports, module) {
 "use strict";
 var comparePoints = function(p1, p2) {
     return p1.row - p2.row || p1.column - p2.column;
@@ -2016,7 +1959,7 @@ Range.comparePoints = function(p1, p2) {
 exports.Range = Range;
 });
 
-ace.define("ace/lib/lang",["require","exports","module"], function(require, exports, module) {
+ace.define("ace/lib/lang",[], function(require, exports, module) {
 "use strict";
 
 exports.last = function(a) {
@@ -2118,7 +2061,7 @@ exports.escapeRegExp = function(str) {
 };
 
 exports.escapeHTML = function(str) {
-    return ("" + str).replace(/&/g, "&#38;").replace(/"/g, "&#34;").replace(/'/g, "&#39;").replace(/</g, "&#60;");
+    return str.replace(/&/g, "&#38;").replace(/"/g, "&#34;").replace(/'/g, "&#39;").replace(/</g, "&#60;");
 };
 
 exports.getMatchOffsets = function(string, regExp) {
@@ -2204,7 +2147,7 @@ exports.delayedCall = function(fcn, defaultTimeout) {
 };
 });
 
-ace.define("ace/keyboard/textinput_ios",["require","exports","module","ace/lib/event","ace/lib/useragent","ace/lib/dom","ace/lib/lang","ace/lib/keys"], function(require, exports, module) {
+ace.define("ace/keyboard/textinput_ios",[], function(require, exports, module) {
 "use strict";
 
 var event = require("../lib/event");
@@ -2674,7 +2617,7 @@ var TextInput = function(parentNode, host) {
 exports.TextInput = TextInput;
 });
 
-ace.define("ace/keyboard/textinput",["require","exports","module","ace/lib/event","ace/lib/useragent","ace/lib/dom","ace/lib/lang","ace/keyboard/textinput_ios"], function(require, exports, module) {
+ace.define("ace/keyboard/textinput",[], function(require, exports, module) {
 "use strict";
 
 var event = require("../lib/event");
@@ -2684,7 +2627,6 @@ var lang = require("../lib/lang");
 var BROKEN_SETDATA = useragent.isChrome < 18;
 var USE_IE_MIME_TYPE =  useragent.isIE;
 var HAS_FOCUS_ARGS = useragent.isChrome > 63;
-var MAX_LINE_LENGTH = 400;
 
 var TextInputIOS = require("./textinput_ios").TextInput;
 var TextInput = function(parentNode, host) {
@@ -2701,33 +2643,24 @@ var TextInput = function(parentNode, host) {
 
     text.style.opacity = "0";
     parentNode.insertBefore(text, parentNode.firstChild);
+    var PLACEHOLDER = useragent.isIE ? "\x01\x01" : "\u2028\u2028";
+    var PLACEHOLDER_RE = useragent.isIE ? /\x01/g : /\u2028/g;
 
     var copied = false;
     var pasted = false;
     var inComposition = false;
-    var sendingText = false;
     var tempStyle = '';
     var isSelectionEmpty = true;
     var copyWithEmptySelection = false;
-    
-    if (!useragent.isMobile)
-        text.style.fontSize = "1px";
 
     var commandMode = false;
-    var ignoreFocusEvents = false;
-    
-    var lastValue = "";
-    var lastSelectionStart = 0;
-    var lastSelectionEnd = 0;
     try { var isFocused = document.activeElement === text; } catch(e) {}
     
     event.addListener(text, "blur", function(e) {
-        if (ignoreFocusEvents) return;
         host.onBlur(e);
         isFocused = false;
     });
     event.addListener(text, "focus", function(e) {
-        if (ignoreFocusEvents) return;
         isFocused = true;
         host.onFocus(e);
         resetSelection();
@@ -2736,8 +2669,6 @@ var TextInput = function(parentNode, host) {
     this.focus = function() {
         if (tempStyle || HAS_FOCUS_ARGS || this.$focusScroll == "browser")
             return text.focus({ preventScroll: true });
-        if (!document.documentElement.contains(text))
-            return;
         var top = text.style.top;
         text.style.position = "fixed";
         text.style.top = "0px";
@@ -2772,91 +2703,68 @@ var TextInput = function(parentNode, host) {
     this.isFocused = function() {
         return isFocused;
     };
-    
-    host.on("beforeEndOperation", function() {
-        if (host.curOp && host.curOp.command.name == "insertstring")
-            return;
-        if (inComposition) {
-            lastValue = text.value = "";
-            onCompositionEnd();
-        }
-        resetSelection();
+    var syncSelection = lang.delayedCall(function() {
+        isFocused && resetSelection(isSelectionEmpty);
     });
-    
-    function resetSelection() {
-        if (inComposition || sendingText)
-            return;
-        if (!isFocused && !afterContextMenu)
+    var syncValue = lang.delayedCall(function() {
+         if (!inComposition) {
+            text.value = PLACEHOLDER;
+            isFocused && resetSelection();
+         }
+    });
+
+    function resetSelection(isEmpty) {
+        isEmpty = copyWithEmptySelection ? false : isEmpty;
+        if (inComposition)
             return;
         inComposition = true;
         
-        var selection = host.selection;
-        var range = selection.getRange();
-        var row = selection.cursor.row;
-        var selectionStart = range.start.column;
-        var selectionEnd = range.end.column;
-        var line = host.session.getLine(row);
-
-        if (range.start.row != row) {
-            var prevLine = host.session.getLine(row - 1);
-            selectionStart = range.start.row < row - 1 ? 0 : selectionStart;
-            selectionEnd += prevLine.length + 1;
-            line = prevLine + "\n" + line;
+        if (inputHandler) {
+            var selectionStart = 0;
+            var selectionEnd = isEmpty ? 0 : text.value.length - 1;
+        } else {
+            var selectionStart = isEmpty ? 2 : 1;
+            var selectionEnd = 2;
         }
-        else if (range.end.row != row) {
-            var nextLine = host.session.getLine(row + 1);
-            selectionEnd = range.end.row > row  + 1 ? nextLine.length : selectionEnd;
-            selectionEnd += line.length + 1;
-            line = line + "\n" + nextLine;
-        }
-
-        if (line.length > MAX_LINE_LENGTH) {
-            if (selectionStart < MAX_LINE_LENGTH && selectionEnd < MAX_LINE_LENGTH) {
-                line = line.slice(0, MAX_LINE_LENGTH);
-            } else {
-                line = "\n";
-                selectionStart = 0;
-                selectionEnd = 1;
-            }
-        }
-
-        var newValue = line + "\n\n";
-        if (newValue != lastValue) {
-            text.value = lastValue = newValue;
-            lastSelectionStart = lastSelectionEnd = newValue.length;
-        }
-        if (afterContextMenu) {
-            lastSelectionStart = text.selectionStart;
-            lastSelectionEnd = text.selectionEnd;
-        }
-        if (lastSelectionEnd != selectionEnd || lastSelectionStart != selectionStart) {
-            try {
-                text.setSelectionRange(selectionStart, selectionEnd);
-                lastSelectionStart = selectionStart;
-                lastSelectionEnd = selectionEnd;
-            } catch(e){}
-        }
+        try {
+            text.setSelectionRange(selectionStart, selectionEnd);
+        } catch(e){}
+        
         inComposition = false;
     }
 
+    function resetValue() {
+        if (inComposition)
+            return;
+        text.value = PLACEHOLDER;
+        if (useragent.isWebKit)
+            syncValue.schedule();
+    }
+
+    useragent.isWebKit || host.addEventListener('changeSelection', function() {
+        if (host.selection.isEmpty() != isSelectionEmpty) {
+            isSelectionEmpty = !isSelectionEmpty;
+            syncSelection.schedule();
+        }
+    });
+
+    resetValue();
     if (isFocused)
         host.onFocus();
 
 
     var isAllSelected = function(text) {
-        return text.selectionStart === 0 && text.selectionEnd >= lastValue.length
-            && text.value === lastValue && lastValue
-            && text.selectionEnd !== lastSelectionEnd;
+        return text.selectionStart === 0 && text.selectionEnd === text.value.length;
     };
 
     var onSelect = function(e) {
-        if (inComposition)
-            return;
         if (copied) {
             copied = false;
         } else if (isAllSelected(text)) {
             host.selectAll();
             resetSelection();
+        } else if (inputHandler) {
+            resetSelection(host.selection.isEmpty());
         }
     };
 
@@ -2865,69 +2773,43 @@ var TextInput = function(parentNode, host) {
     this.getInputHandler = function() {return inputHandler;};
     var afterContextMenu = false;
     
-    var sendText = function(value, fromInput) {
-        if (afterContextMenu)
-            afterContextMenu = false;
+    var sendText = function(data) {
+        if (inputHandler) {
+            data = inputHandler(data);
+            inputHandler = null;
+        }
         if (pasted) {
             resetSelection();
-            if (value)
-                host.onPaste(value);
+            if (data)
+                host.onPaste(data);
             pasted = false;
-            return "";
+        } else if (data == PLACEHOLDER.charAt(0)) {
+            if (afterContextMenu)
+                host.execCommand("del", {source: "ace"});
+            else // some versions of android do not fire keydown when pressing backspace
+                host.execCommand("backspace", {source: "ace"});
         } else {
-            var selectionStart = text.selectionStart;
-            var selectionEnd = text.selectionEnd;
-        
-            var extendLeft = lastSelectionStart;
-            var extendRight = lastValue.length - lastSelectionEnd;
+            if (data.substring(0, 2) == PLACEHOLDER)
+                data = data.substr(2);
+            else if (data.charAt(0) == PLACEHOLDER.charAt(0))
+                data = data.substr(1);
+            else if (data.charAt(data.length - 1) == PLACEHOLDER.charAt(0))
+                data = data.slice(0, -1);
+            if (data.charAt(data.length - 1) == PLACEHOLDER.charAt(0))
+                data = data.slice(0, -1);
             
-            var inserted = value;
-            var restoreStart = value.length - selectionStart;
-            var restoreEnd = value.length - selectionEnd;
-        
-            var i = 0;
-            while (extendLeft > 0 && lastValue[i] == value[i]) {
-                i++;
-                extendLeft--;
-            }
-            inserted = inserted.slice(i);
-            i = 1;
-            while (extendRight > 0 && lastValue.length - i > lastSelectionStart - 1  && lastValue[lastValue.length - i] == value[value.length - i]) {
-                i++;
-                extendRight--;
-            }
-            restoreStart -= i-1;
-            restoreEnd -= i-1;
-            inserted = inserted.slice(0, inserted.length - i+1);
-            if (!fromInput && restoreStart == inserted.length && !extendLeft && !extendRight && !restoreEnd)
-                return "";
-            
-            sendingText = true;
-            if (inserted && !extendLeft && !extendRight && !restoreStart && !restoreEnd || commandMode) {
-                host.onTextInput(inserted);
-            } else {
-                host.onTextInput(inserted, {
-                    extendLeft: extendLeft,
-                    extendRight: extendRight,
-                    restoreStart: restoreStart,
-                    restoreEnd: restoreEnd
-                });
-            }
-            sendingText = false;
-            
-            lastValue = value;
-            lastSelectionStart = selectionStart;
-            lastSelectionEnd = selectionEnd;
-            return inserted;
+            if (data)
+                host.onTextInput(data);
         }
+        if (afterContextMenu)
+            afterContextMenu = false;
     };
     var onInput = function(e) {
         if (inComposition)
-            return onCompositionUpdate();
+            return;
         var data = text.value;
-        var inserted = sendText(data, true);
-        if (data.length > MAX_LINE_LENGTH + 100 || /\n/.test(inserted))
-            resetSelection();
+        sendText(data);
+        resetValue();
     };
     
     var handleClipboardData = function(e, data, forceIEMime) {
@@ -2961,6 +2843,7 @@ var TextInput = function(parentNode, host) {
             text.select();
             setTimeout(function(){
                 copied = false;
+                resetValue();
                 resetSelection();
                 isCut ? host.onCut() : host.onCopy();
             });
@@ -2993,6 +2876,7 @@ var TextInput = function(parentNode, host) {
     event.addCommandKeyListener(text, host.onCommandKey.bind(host));
 
     event.addListener(text, "select", onSelect);
+
     event.addListener(text, "input", onInput);
 
     event.addListener(text, "cut", onCut);
@@ -3019,96 +2903,94 @@ var TextInput = function(parentNode, host) {
     var onCompositionStart = function(e) {
         if (inComposition || !host.onCompositionStart || host.$readOnly) 
             return;
-        
         inComposition = {};
-
-        if (commandMode)
-            return;
-        
+        inComposition.canUndo = host.session.$undoManager;
+        host.onCompositionStart();
         setTimeout(onCompositionUpdate, 0);
-        host.on("mousedown", cancelComposition);
-        
-        var range = host.getSelectionRange();
-        range.end.row = range.start.row;
-        range.end.column = range.start.column;
-        inComposition.markerRange = range;
-        inComposition.selectionStart = lastSelectionStart;
-        host.onCompositionStart(inComposition);
-        
-        if (inComposition.useTextareaForIME) {
-            text.value = "";
-            lastValue = "";
-            lastSelectionStart = 0;
-            lastSelectionEnd = 0;
+        host.on("mousedown", onCompositionEnd);
+        if (inComposition.canUndo && !host.selection.isEmpty()) {
+            host.insert("");
+            host.session.markUndoGroup();
+            host.selection.clearSelection();
         }
-        else {
-            if (text.msGetInputContext)
-                inComposition.context = text.msGetInputContext();
-            if (text.getInputContext)
-                inComposition.context = text.getInputContext();
-        }
+        host.session.markUndoGroup();
     };
 
     var onCompositionUpdate = function() {
         if (!inComposition || !host.onCompositionUpdate || host.$readOnly)
             return;
-        if (commandMode)
-            return cancelComposition();
+        var val = text.value.replace(PLACEHOLDER_RE, "");
+        if (inComposition.lastValue === val) return;
         
-        if (inComposition.useTextareaForIME) {
-            host.onCompositionUpdate(text.value);
-        }
-        else {
-            var data = text.value;
-            sendText(data);
-            if (inComposition.markerRange) {
-                if (inComposition.context) {
-                    inComposition.markerRange.start.column = inComposition.selectionStart
-                        = inComposition.context.compositionStartOffset;
-                }
-                inComposition.markerRange.end.column = inComposition.markerRange.start.column
-                    + lastSelectionEnd - inComposition.selectionStart;
-            }
+        host.onCompositionUpdate(val);
+        if (inComposition.lastValue)
+            host.undo();
+        if (inComposition.canUndo)
+            inComposition.lastValue = val;
+        if (inComposition.lastValue) {
+            var r = host.selection.getRange();
+            host.insert(inComposition.lastValue);
+            host.session.markUndoGroup();
+            inComposition.range = host.selection.getRange();
+            host.selection.setRange(r);
+            host.selection.clearSelection();
         }
     };
 
     var onCompositionEnd = function(e) {
         if (!host.onCompositionEnd || host.$readOnly) return;
+        var c = inComposition;
         inComposition = false;
+        var timer = setTimeout(function() {
+            timer = null;
+            var str = text.value.replace(PLACEHOLDER_RE, "");
+            if (inComposition)
+                return;
+            else if (str == c.lastValue)
+                resetValue();
+            else if (!c.lastValue && str) {
+                resetValue();
+                sendText(str);
+            }
+        });
+        inputHandler = function compositionInputHandler(str) {
+            if (timer)
+                clearTimeout(timer);
+            str = str.replace(PLACEHOLDER_RE, "");
+            if (str == c.lastValue)
+                return "";
+            if (c.lastValue && timer)
+                host.undo();
+            return str;
+        };
         host.onCompositionEnd();
-        host.off("mousedown", cancelComposition);
-        if (e) onInput();
+        host.removeListener("mousedown", onCompositionEnd);
+        if (e.type == "compositionend" && c.range) {
+            host.selection.setRange(c.range);
+        }
+        var needsOnInput = useragent.isIE ||
+            (useragent.isChrome && useragent.isChrome >= 53) ||
+            (useragent.isWebKit && useragent.isWebKit >= 603);
+
+        if (needsOnInput) {
+          onInput();
+        }
     };
     
-
-    function cancelComposition() {
-        ignoreFocusEvents = true;
-        text.blur();
-        text.focus();
-        ignoreFocusEvents = false;
-    }
-
-    var syncComposition = lang.delayedCall(onCompositionUpdate, 50).schedule.bind(null, null);
     
-    function onKeyup(e) {
-        if (e.keyCode == 27 && text.value.length < text.selectionStart) {
-            if (!inComposition)
-                lastValue = text.value;
-            lastSelectionStart = lastSelectionEnd = -1;
-            resetSelection();
-        }
-        syncComposition();
-    }
+
+    var syncComposition = lang.delayedCall(onCompositionUpdate, 50);
 
     event.addListener(text, "compositionstart", onCompositionStart);
-    event.addListener(text, "compositionupdate", onCompositionUpdate);
-    event.addListener(text, "keyup", onKeyup);
-    event.addListener(text, "keydown", syncComposition);
+    event.addListener(text, "compositionupdate", function(){syncComposition.schedule();});
+    event.addListener(text, "keyup", function(){syncComposition.schedule();});
+    event.addListener(text, "keydown", function(){syncComposition.schedule();});
     event.addListener(text, "compositionend", onCompositionEnd);
 
     this.getElement = function() {
         return text;
     };
+
     this.setCommandMode = function(value) {
        commandMode = value;
        text.readOnly = false;
@@ -3125,7 +3007,7 @@ var TextInput = function(parentNode, host) {
 
     this.onContextMenu = function(e) {
         afterContextMenu = true;
-        resetSelection();
+        resetSelection(host.selection.isEmpty());
         host._emit("nativecontextmenu", {target: host, domEvent: e});
         this.moveToMouse(e, true);
     };
@@ -3134,8 +3016,8 @@ var TextInput = function(parentNode, host) {
         if (!tempStyle)
             tempStyle = text.style.cssText;
         text.style.cssText = (bringToFront ? "z-index:100000;" : "")
-            + (useragent.isIE ? "opacity:0.1;" : "")
-            + "text-indent: -" + (lastSelectionStart + lastSelectionEnd) * host.renderer.characterWidth * 0.5 + "px;";
+            + "height:" + text.style.height + ";"
+            + (useragent.isIE ? "opacity:0.1;" : "");
 
         var rect = host.container.getBoundingClientRect();
         var style = dom.computedStyle(host.container);
@@ -3191,9 +3073,11 @@ var TextInput = function(parentNode, host) {
 exports.TextInput = TextInput;
 });
 
-ace.define("ace/mouse/default_handlers",["require","exports","module","ace/lib/useragent"], function(require, exports, module) {
+ace.define("ace/mouse/default_handlers",[], function(require, exports, module) {
 "use strict";
 
+var dom = require("../lib/dom");
+var event = require("../lib/event");
 var useragent = require("../lib/useragent");
 
 var DRAG_OFFSET = 0; // pixels
@@ -3261,7 +3145,6 @@ function DefaultHandlers(mouseHandler) {
     this.startSelect = function(pos, waitForClickSelection) {
         pos = pos || this.editor.renderer.screenToTextCoordinates(this.x, this.y);
         var editor = this.editor;
-        if (!this.mousedownEvent) return;
         if (this.mousedownEvent.getShiftKey())
             editor.selection.selectToPosition(pos);
         else if (!waitForClickSelection)
@@ -3471,7 +3354,7 @@ function calcRangeOrientation(range, cursor) {
 
 });
 
-ace.define("ace/tooltip",["require","exports","module","ace/lib/oop","ace/lib/dom"], function(require, exports, module) {
+ace.define("ace/tooltip",[], function(require, exports, module) {
 "use strict";
 
 var oop = require("./lib/oop");
@@ -3542,7 +3425,7 @@ function Tooltip (parentNode) {
 exports.Tooltip = Tooltip;
 });
 
-ace.define("ace/mouse/default_gutter_handler",["require","exports","module","ace/lib/dom","ace/lib/oop","ace/lib/event","ace/tooltip"], function(require, exports, module) {
+ace.define("ace/mouse/default_gutter_handler",[], function(require, exports, module) {
 "use strict";
 var dom = require("../lib/dom");
 var oop = require("../lib/oop");
@@ -3696,7 +3579,7 @@ exports.GutterHandler = GutterHandler;
 
 });
 
-ace.define("ace/mouse/mouse_event",["require","exports","module","ace/lib/event","ace/lib/useragent"], function(require, exports, module) {
+ace.define("ace/mouse/mouse_event",[], function(require, exports, module) {
 "use strict";
 
 var event = require("../lib/event");
@@ -3770,7 +3653,7 @@ var MouseEvent = exports.MouseEvent = function(domEvent, editor) {
 
 });
 
-ace.define("ace/mouse/dragdrop_handler",["require","exports","module","ace/lib/dom","ace/lib/event","ace/lib/useragent"], function(require, exports, module) {
+ace.define("ace/mouse/dragdrop_handler",[], function(require, exports, module) {
 "use strict";
 
 var dom = require("../lib/dom");
@@ -4148,7 +4031,7 @@ exports.DragdropHandler = DragdropHandler;
 
 });
 
-ace.define("ace/lib/net",["require","exports","module","ace/lib/dom"], function(require, exports, module) {
+ace.define("ace/lib/net",[], function(require, exports, module) {
 "use strict";
 var dom = require("./dom");
 
@@ -4186,7 +4069,7 @@ exports.qualifyURL = function(url) {
 
 });
 
-ace.define("ace/lib/event_emitter",["require","exports","module"], function(require, exports, module) {
+ace.define("ace/lib/event_emitter",[], function(require, exports, module) {
 "use strict";
 
 var EventEmitter = {};
@@ -4267,6 +4150,7 @@ EventEmitter.removeDefaultHandler = function(eventName, callback) {
     var disabled = handlers._disabled_[eventName];
     
     if (handlers[eventName] == callback) {
+        var old = handlers[eventName];
         if (disabled)
             this.setDefaultHandler(eventName, disabled.pop());
     } else if (disabled) {
@@ -4311,7 +4195,7 @@ exports.EventEmitter = EventEmitter;
 
 });
 
-ace.define("ace/lib/app_config",["require","exports","module","ace/lib/oop","ace/lib/event_emitter"], function(require, exports, module) {
+ace.define("ace/lib/app_config",[], function(require, exports, module) {
 "no use strict";
 
 var oop = require("./oop");
@@ -4436,7 +4320,7 @@ exports.AppConfig = AppConfig;
 
 });
 
-ace.define("ace/config",["require","exports","module","ace/lib/lang","ace/lib/oop","ace/lib/net","ace/lib/app_config"], function(require, exports, module) {
+ace.define("ace/config",[], function(require, exports, module) {
 "no use strict";
 
 var lang = require("./lib/lang");
@@ -4477,8 +4361,6 @@ exports.set = function(key, value) {
 exports.all = function() {
     return lang.copyObject(options);
 };
-
-exports.$modes = {};
 exports.moduleUrl = function(name, component) {
     if (options.$moduleUrls[name])
         return options.$moduleUrls[name];
@@ -4544,24 +4426,7 @@ exports.loadModule = function(moduleName, onLoad) {
 
     if (!exports.get("packaged"))
         return afterLoad();
-    
     net.loadScript(exports.moduleUrl(moduleName, moduleType), afterLoad);
-    reportErrorIfPathIsNotConfigured();
-};
-
-var reportErrorIfPathIsNotConfigured = function() {
-    if (
-        !options.basePath && !options.workerPath 
-        && !options.modePath && !options.themePath
-        && !Object.keys(options.$moduleUrls).length
-    ) {
-        console.error(
-            "Unable to infer path to ace from script src,",
-            "use ace.config.set('basePath', 'path') to enable dynamic loading of modes and themes",
-            "or with webpack use ace/webpack-resolver"
-        );
-        reportErrorIfPathIsNotConfigured = function() {};
-    }
 };
 init(true);function init(packaged) {
 
@@ -4620,7 +4485,7 @@ function deHyphenate(str) {
 
 });
 
-ace.define("ace/mouse/mouse_handler",["require","exports","module","ace/lib/event","ace/lib/useragent","ace/mouse/default_handlers","ace/mouse/default_gutter_handler","ace/mouse/mouse_event","ace/mouse/dragdrop_handler","ace/config"], function(require, exports, module) {
+ace.define("ace/mouse/mouse_handler",[], function(require, exports, module) {
 "use strict";
 
 var event = require("../lib/event");
@@ -4758,7 +4623,6 @@ var MouseHandler = function(editor) {
             self.isMousePressed = false;
             self.$onCaptureMouseMove = self.releaseMouse = null;
             e && self.onMouseEvent("mouseup", e);
-            editor.endOperation();
         };
 
         var onCaptureInterval = function() {
@@ -4771,7 +4635,6 @@ var MouseHandler = function(editor) {
         }
 
         var onOperationEnd = function(e) {
-            if (!self.releaseMouse) return;
             if (editor.curOp.command.name && editor.curOp.selectionChanged) {
                 self[self.state + "End"] && self[self.state + "End"]();
                 self.state = "";
@@ -4780,7 +4643,6 @@ var MouseHandler = function(editor) {
         };
 
         editor.on("beforeEndOperation", onOperationEnd);
-        editor.startOperation({command: {name: "mouse"}});
 
         self.$onCaptureMouseMove = onMouseMove;
         self.releaseMouse = event.capture(this.editor.container, onMouseMove, onCaptureEnd);
@@ -4812,7 +4674,7 @@ config.defineOptions(MouseHandler.prototype, "mouseHandler", {
 exports.MouseHandler = MouseHandler;
 });
 
-ace.define("ace/mouse/fold_handler",["require","exports","module","ace/lib/dom"], function(require, exports, module) {
+ace.define("ace/mouse/fold_handler",[], function(require, exports, module) {
 "use strict";
 var dom = require("../lib/dom");
 
@@ -4883,7 +4745,7 @@ exports.FoldHandler = FoldHandler;
 
 });
 
-ace.define("ace/keyboard/keybinding",["require","exports","module","ace/lib/keys","ace/lib/event"], function(require, exports, module) {
+ace.define("ace/keyboard/keybinding",[], function(require, exports, module) {
 "use strict";
 
 var keyUtil  = require("../lib/keys");
@@ -5003,7 +4865,7 @@ var KeyBinding = function(editor) {
 exports.KeyBinding = KeyBinding;
 });
 
-ace.define("ace/lib/bidiutil",["require","exports","module"], function(require, exports, module) {
+ace.define("ace/lib/bidiutil",[], function(require, exports, module) {
 "use strict";
 
 var ArabicAlefBetIntervalsBegine = ['\u0621', '\u0641'];
@@ -5285,7 +5147,6 @@ exports.ON_R = 3;
 exports.AN = 4;
 exports.R_H = 5;
 exports.B = 6;
-exports.RLE = 7;
 
 exports.DOT = "\xB7";
 exports.doBidiReorder = function(text, textCharTypes, isRtl) {
@@ -5318,9 +5179,6 @@ exports.doBidiReorder = function(text, textCharTypes, isRtl) {
 	if (chars[chars.length - 1] === exports.DOT)
 		levels[chars.length - 1] = exports.B;
 				
-	if (chars[0] === '\u202B')
-		levels[0] = exports.RLE;
-				
 	for (var i = 0; i < logicalFromVisual.length; i++) {
 		bidiLevels[i] = levels[logicalFromVisual[i]];
 	}
@@ -5331,7 +5189,7 @@ exports.hasBidiCharacters = function(text, textCharTypes){
 	var ret = false;
 	for (var i = 0; i < text.length; i++){
 		textCharTypes[i] = _getCharacterType(text.charAt(i));
-		if (!ret && (textCharTypes[i] == R || textCharTypes[i] == AL || textCharTypes[i] == AN))
+		if (!ret && (textCharTypes[i] == R || textCharTypes[i] == AL))
 			ret = true;
 	}
 	return ret;
@@ -5347,12 +5205,13 @@ exports.getVisualFromLogicalIdx = function(logIdx, rowMap) {
 
 });
 
-ace.define("ace/bidihandler",["require","exports","module","ace/lib/bidiutil","ace/lib/lang"], function(require, exports, module) {
+ace.define("ace/bidihandler",[], function(require, exports, module) {
 "use strict";
 
 var bidiUtil = require("./lib/bidiutil");
 var lang = require("./lib/lang");
-var bidiRE = /[\u0590-\u05f4\u0600-\u06ff\u0700-\u08ac\u202B]/;
+var useragent = require("./lib/useragent");
+var bidiRE = /[\u0590-\u05f4\u0600-\u06ff\u0700-\u08ac]/;
 var BidiHandler = function(session) {
     this.session = session;
     this.bidiMap = {};
@@ -5364,14 +5223,9 @@ var BidiHandler = function(session) {
     this.isRtlDir = false;
     this.line = "";
     this.wrapIndent = 0;
+    this.isLastRow = false;
     this.EOF = "\xB6";
-    this.RLE = "\u202B";
-    this.contentWidth = 0;
-    this.fontMetrics = null;
-    this.rtlLineOffset = 0;
-    this.wrapOffset = 0;
-    this.isMoveLeftOperation = false;
-    this.seenBidi = bidiRE.test(session.getValue());
+    this.seenBidi = false;
 };
 
 (function() {
@@ -5423,8 +5277,6 @@ var BidiHandler = function(session) {
                 prevIndex = currentIndex;
                 splitIndex++;
             }
-        } else {
-            splitIndex = this.currentRow;
         }
 
         return splitIndex;
@@ -5434,12 +5286,9 @@ var BidiHandler = function(session) {
         if (docRow === undefined)
             docRow = this.getDocumentRow();
             
-        var isLastRow = (docRow === this.session.getLength() - 1),
-            endOfLine = isLastRow ? this.EOF : this.EOL;
-
         this.wrapIndent = 0;
+        this.isLastRow = (docRow === this.session.getLength() - 1);
         this.line = this.session.getLine(docRow);
-        this.isRtlDir = this.line.charAt(0) === this.RLE;
         if (this.session.$useWrapMode) {
             var splits = this.session.$wrapData[docRow];
             if (splits) {
@@ -5448,18 +5297,13 @@ var BidiHandler = function(session) {
 
                 if(splitIndex > 0 && splits.length) {
                     this.wrapIndent = splits.indent;
-                    this.wrapOffset = this.wrapIndent * this.charWidths[bidiUtil.L];
                     this.line = (splitIndex < splits.length) ?
-                        this.line.substring(splits[splitIndex - 1], splits[splitIndex]) :
+                        this.line.substring(splits[splitIndex - 1], splits[splits.length - 1]) :
                             this.line.substring(splits[splits.length - 1]);
                 } else {
                     this.line = this.line.substring(0, splits[splitIndex]);
                 }
             }
-            if (splitIndex == splits.length)
-                this.line += (this.showInvisibles) ? endOfLine : bidiUtil.DOT;
-        } else {
-            this.line += this.showInvisibles ? endOfLine : bidiUtil.DOT;
         }
         var session = this.session, shift = 0, size;
         this.line = this.line.replace(/\t|[\u1100-\u2029, \u202F-\uFFE6]/g, function(ch, i){
@@ -5470,17 +5314,13 @@ var BidiHandler = function(session) {
             }
             return ch;
         });
-
-        if (this.isRtlDir) {
-            this.fontMetrics.$main.innerHTML = (this.line.charAt(this.line.length - 1) == bidiUtil.DOT) ? this.line.substr(0, this.line.length - 1) : this.line;
-            this.rtlLineOffset = this.contentWidth - this.fontMetrics.$main.getBoundingClientRect().width;
-        }
     };
     
     this.updateBidiMap = function() {
-        var textCharTypes = [];
-        if (bidiUtil.hasBidiCharacters(this.line, textCharTypes) || this.isRtlDir) {
-             this.bidiMap = bidiUtil.doBidiReorder(this.line, textCharTypes, this.isRtlDir);
+        var textCharTypes = [], endOfLine = this.isLastRow ? this.EOF : this.EOL;
+        var line = this.line + (this.showInvisibles ? endOfLine : bidiUtil.DOT);
+        if (bidiUtil.hasBidiCharacters(line, textCharTypes)) {
+            this.bidiMap = bidiUtil.doBidiReorder(line, textCharTypes, this.isRtlDir);
         } else {
             this.bidiMap = {};
         }
@@ -5489,19 +5329,24 @@ var BidiHandler = function(session) {
         this.currentRow = null;
     };
     this.updateCharacterWidths = function(fontMetrics) {
+        if (!this.seenBidi)
+            return;
         if (this.characterWidth === fontMetrics.$characterSize.width)
             return;
 
-        this.fontMetrics = fontMetrics;
         var characterWidth = this.characterWidth = fontMetrics.$characterSize.width;
         var bidiCharWidth = fontMetrics.$measureCharWidth("\u05d4");
 
         this.charWidths[bidiUtil.L] = this.charWidths[bidiUtil.EN] = this.charWidths[bidiUtil.ON_R] = characterWidth;
         this.charWidths[bidiUtil.R] = this.charWidths[bidiUtil.AN] = bidiCharWidth;
-        this.charWidths[bidiUtil.R_H] = bidiCharWidth * 0.45;
-        this.charWidths[bidiUtil.B] = this.charWidths[bidiUtil.RLE] = 0;
+        this.charWidths[bidiUtil.R_H] = useragent.isChrome ? bidiCharWidth : bidiCharWidth * 0.45;
+        this.charWidths[bidiUtil.B] = 0;
 
         this.currentRow = null;
+    };
+
+    this.getShowInvisibles = function() {
+        return this.showInvisibles;
     };
 
     this.setShowInvisibles = function(showInvisibles) {
@@ -5513,58 +5358,33 @@ var BidiHandler = function(session) {
         this.EOL = eolChar; 
     };
 
-    this.setContentWidth = function(width) {
-        this.contentWidth = width;
-    };
-
-    this.isRtlLine = function(row) {
-        if (row != undefined)
-            return (this.session.getLine(row).charAt(0) == this.RLE);
-        else
-            return this.isRtlDir; 
-    };
-
-    this.setRtlDirection = function(editor, isRtlDir) {
-        var cursor = editor.getCursorPosition(); 
-        for (var row = editor.selection.getSelectionAnchor().row; row <= cursor.row; row++) {
-            if (!isRtlDir && editor.session.getLine(row).charAt(0) === editor.session.$bidiHandler.RLE)
-                editor.session.doc.removeInLine(row, 0, 1);
-            else if (isRtlDir && editor.session.getLine(row).charAt(0) !== editor.session.$bidiHandler.RLE)
-                editor.session.doc.insert({column: 0, row: row}, editor.session.$bidiHandler.RLE);
-        }
+    this.setTextDir = function(isRtlDir) {
+        this.isRtlDir = isRtlDir; 
     };
     this.getPosLeft = function(col) {
         col -= this.wrapIndent;
-        var leftBoundary = (this.line.charAt(0) === this.RLE) ? 1 : 0;
-        var logicalIdx = (col > leftBoundary) ? (this.session.getOverwrite() ? col : col - 1) : leftBoundary;
-        var visualIdx = bidiUtil.getVisualFromLogicalIdx(logicalIdx, this.bidiMap),
+        var visualIdx = bidiUtil.getVisualFromLogicalIdx(col > 0 ? col - 1 : 0, this.bidiMap),
             levels = this.bidiMap.bidiLevels, left = 0;
 
-        if (!this.session.getOverwrite() && col <= leftBoundary && levels[visualIdx] % 2 !== 0)
+        if (col === 0 && levels[visualIdx] % 2 !== 0)
             visualIdx++;
-            
+
         for (var i = 0; i < visualIdx; i++) {
             left += this.charWidths[levels[i]];
         }
 
-        if (!this.session.getOverwrite() && (col > leftBoundary) && (levels[visualIdx] % 2 === 0))
+        if (col !== 0 && levels[visualIdx] % 2 === 0)
             left += this.charWidths[levels[visualIdx]];
 
         if (this.wrapIndent)
-            left += this.isRtlDir ? (-1 * this.wrapOffset) : this.wrapOffset;
-
-        if (this.isRtlDir)
-            left += this.rtlLineOffset;
+            left += this.wrapIndent * this.charWidths[bidiUtil.L];
 
         return left;
     };
     this.getSelections = function(startCol, endCol) {
-        var map = this.bidiMap, levels = map.bidiLevels, level, selections = [], offset = 0,
+        var map = this.bidiMap, levels = map.bidiLevels, level, offset = this.wrapIndent * this.charWidths[bidiUtil.L], selections = [],
             selColMin = Math.min(startCol, endCol) - this.wrapIndent, selColMax = Math.max(startCol, endCol) - this.wrapIndent,
                 isSelected = false, isSelectedPrev = false, selectionStart = 0;
-            
-        if (this.wrapIndent)
-            offset += this.isRtlDir ? (-1 * this.wrapOffset) : this.wrapOffset;
 
         for (var logIdx, visIdx = 0; visIdx < levels.length; visIdx++) {
             logIdx = map.logicalFromVisual[visIdx];
@@ -5583,23 +5403,16 @@ var BidiHandler = function(session) {
             selections.push({left: selectionStart, width: offset - selectionStart});
         }
 
-        if(this.isRtlDir) {
-            for (var i = 0; i < selections.length; i++) {
-                selections[i].left += this.rtlLineOffset;
-            }
-        }
         return selections;
     };
     this.offsetToCol = function(posX) {
-        if(this.isRtlDir)
-            posX -= this.rtlLineOffset;
-
         var logicalIdx = 0, posX = Math.max(posX, 0),
             offset = 0, visualIdx = 0, levels = this.bidiMap.bidiLevels,
                 charWidth = this.charWidths[levels[visualIdx]];
 
-        if (this.wrapIndent)
-           posX -= this.isRtlDir ? (-1 * this.wrapOffset) : this.wrapOffset;
+        if (this.wrapIndent) {
+            posX -= this.wrapIndent * this.charWidths[bidiUtil.L];
+        }
     
         while(posX > offset + charWidth/2) {
             offset += charWidth;
@@ -5628,9 +5441,6 @@ var BidiHandler = function(session) {
             logicalIdx = this.bidiMap.logicalFromVisual[visualIdx];
         }
 
-        if (logicalIdx === 0 && this.isRtlDir)
-            logicalIdx++;
-
         return (logicalIdx + this.wrapIndent);
     };
 
@@ -5639,7 +5449,7 @@ var BidiHandler = function(session) {
 exports.BidiHandler = BidiHandler;
 });
 
-ace.define("ace/selection",["require","exports","module","ace/lib/oop","ace/lib/lang","ace/lib/event_emitter","ace/range"], function(require, exports, module) {
+ace.define("ace/selection",[], function(require, exports, module) {
 "use strict";
 
 var oop = require("./lib/oop");
@@ -6258,7 +6068,7 @@ var Selection = function(session) {
 exports.Selection = Selection;
 });
 
-ace.define("ace/tokenizer",["require","exports","module","ace/config"], function(require, exports, module) {
+ace.define("ace/tokenizer",[], function(require, exports, module) {
 "use strict";
 
 var config = require("./config");
@@ -6386,7 +6196,7 @@ var Tokenizer = function(rules) {
 
     this.removeCapturingGroups = function(src) {
         var r = src.replace(
-            /\\.|\[(?:\\.|[^\\\]])*|\(\?[:=!]|(\()/g,
+            /\[(?:\\.|[^\]])*?\]|\\.|\(\?[:=!]|(\()/g,
             function(x, y) {return y ? "(?:" : x;}
         );
         return r;
@@ -6570,7 +6380,7 @@ var Tokenizer = function(rules) {
 exports.Tokenizer = Tokenizer;
 });
 
-ace.define("ace/mode/text_highlight_rules",["require","exports","module","ace/lib/lang"], function(require, exports, module) {
+ace.define("ace/mode/text_highlight_rules",[], function(require, exports, module) {
 "use strict";
 
 var lang = require("../lib/lang");
@@ -6771,7 +6581,7 @@ var TextHighlightRules = function() {
 exports.TextHighlightRules = TextHighlightRules;
 });
 
-ace.define("ace/mode/behaviour",["require","exports","module"], function(require, exports, module) {
+ace.define("ace/mode/behaviour",[], function(require, exports, module) {
 "use strict";
 
 var Behaviour = function() {
@@ -6832,7 +6642,7 @@ var Behaviour = function() {
 exports.Behaviour = Behaviour;
 });
 
-ace.define("ace/token_iterator",["require","exports","module","ace/range"], function(require, exports, module) {
+ace.define("ace/token_iterator",[], function(require, exports, module) {
 "use strict";
 
 var Range = require("./range").Range;
@@ -6915,7 +6725,7 @@ var TokenIterator = function(session, initialRow, initialColumn) {
 exports.TokenIterator = TokenIterator;
 });
 
-ace.define("ace/mode/behaviour/cstyle",["require","exports","module","ace/lib/oop","ace/mode/behaviour","ace/token_iterator","ace/lib/lang"], function(require, exports, module) {
+ace.define("ace/mode/behaviour/cstyle",[], function(require, exports, module) {
 "use strict";
 
 var oop = require("../../lib/oop");
@@ -7193,10 +7003,8 @@ var CstyleBehaviour = function(options) {
     });
 
     this.add("string_dquotes", "deletion", function(state, action, editor, session, range) {
-        var quotes = session.$mode.$quotes || defaultQuotes;
-
         var selected = session.doc.getTextRange(range);
-        if (!range.isMultiLine() && quotes.hasOwnProperty(selected)) {
+        if (!range.isMultiLine() && (selected == '"' || selected == "'")) {
             initContext(editor);
             var line = session.doc.getLine(range.start.row);
             var rightChar = line.substring(range.start.column + 1, range.start.column + 2);
@@ -7281,7 +7089,7 @@ oop.inherits(CstyleBehaviour, Behaviour);
 exports.CstyleBehaviour = CstyleBehaviour;
 });
 
-ace.define("ace/unicode",["require","exports","module"], function(require, exports, module) {
+ace.define("ace/unicode",[], function(require, exports, module) {
 "use strict";
 var wordChars = [48,9,8,25,5,0,2,25,48,0,11,0,5,0,6,22,2,30,2,457,5,11,15,4,8,0,2,0,18,116,2,1,3,3,9,0,2,2,2,0,2,19,2,82,2,138,2,4,3,155,12,37,3,0,8,38,10,44,2,0,2,1,2,1,2,0,9,26,6,2,30,10,7,61,2,9,5,101,2,7,3,9,2,18,3,0,17,58,3,100,15,53,5,0,6,45,211,57,3,18,2,5,3,11,3,9,2,1,7,6,2,2,2,7,3,1,3,21,2,6,2,0,4,3,3,8,3,1,3,3,9,0,5,1,2,4,3,11,16,2,2,5,5,1,3,21,2,6,2,1,2,1,2,1,3,0,2,4,5,1,3,2,4,0,8,3,2,0,8,15,12,2,2,8,2,2,2,21,2,6,2,1,2,4,3,9,2,2,2,2,3,0,16,3,3,9,18,2,2,7,3,1,3,21,2,6,2,1,2,4,3,8,3,1,3,2,9,1,5,1,2,4,3,9,2,0,17,1,2,5,4,2,2,3,4,1,2,0,2,1,4,1,4,2,4,11,5,4,4,2,2,3,3,0,7,0,15,9,18,2,2,7,2,2,2,22,2,9,2,4,4,7,2,2,2,3,8,1,2,1,7,3,3,9,19,1,2,7,2,2,2,22,2,9,2,4,3,8,2,2,2,3,8,1,8,0,2,3,3,9,19,1,2,7,2,2,2,22,2,15,4,7,2,2,2,3,10,0,9,3,3,9,11,5,3,1,2,17,4,23,2,8,2,0,3,6,4,0,5,5,2,0,2,7,19,1,14,57,6,14,2,9,40,1,2,0,3,1,2,0,3,0,7,3,2,6,2,2,2,0,2,0,3,1,2,12,2,2,3,4,2,0,2,5,3,9,3,1,35,0,24,1,7,9,12,0,2,0,2,0,5,9,2,35,5,19,2,5,5,7,2,35,10,0,58,73,7,77,3,37,11,42,2,0,4,328,2,3,3,6,2,0,2,3,3,40,2,3,3,32,2,3,3,6,2,0,2,3,3,14,2,56,2,3,3,66,5,0,33,15,17,84,13,619,3,16,2,25,6,74,22,12,2,6,12,20,12,19,13,12,2,2,2,1,13,51,3,29,4,0,5,1,3,9,34,2,3,9,7,87,9,42,6,69,11,28,4,11,5,11,11,39,3,4,12,43,5,25,7,10,38,27,5,62,2,28,3,10,7,9,14,0,89,75,5,9,18,8,13,42,4,11,71,55,9,9,4,48,83,2,2,30,14,230,23,280,3,5,3,37,3,5,3,7,2,0,2,0,2,0,2,30,3,52,2,6,2,0,4,2,2,6,4,3,3,5,5,12,6,2,2,6,67,1,20,0,29,0,14,0,17,4,60,12,5,0,4,11,18,0,5,0,3,9,2,0,4,4,7,0,2,0,2,0,2,3,2,10,3,3,6,4,5,0,53,1,2684,46,2,46,2,132,7,6,15,37,11,53,10,0,17,22,10,6,2,6,2,6,2,6,2,6,2,6,2,6,2,6,2,31,48,0,470,1,36,5,2,4,6,1,5,85,3,1,3,2,2,89,2,3,6,40,4,93,18,23,57,15,513,6581,75,20939,53,1164,68,45,3,268,4,27,21,31,3,13,13,1,2,24,9,69,11,1,38,8,3,102,3,1,111,44,25,51,13,68,12,9,7,23,4,0,5,45,3,35,13,28,4,64,15,10,39,54,10,13,3,9,7,22,4,1,5,66,25,2,227,42,2,1,3,9,7,11171,13,22,5,48,8453,301,3,61,3,105,39,6,13,4,6,11,2,12,2,4,2,0,2,1,2,1,2,107,34,362,19,63,3,53,41,11,5,15,17,6,13,1,25,2,33,4,2,134,20,9,8,25,5,0,2,25,12,88,4,5,3,5,3,5,3,2];
 
@@ -7297,9 +7105,8 @@ exports.wordChars = String.fromCharCode.apply(null, str);
 
 });
 
-ace.define("ace/mode/text",["require","exports","module","ace/config","ace/tokenizer","ace/mode/text_highlight_rules","ace/mode/behaviour/cstyle","ace/unicode","ace/lib/lang","ace/token_iterator","ace/range"], function(require, exports, module) {
+ace.define("ace/mode/text",[], function(require, exports, module) {
 "use strict";
-var config = require("../config");
 
 var Tokenizer = require("../tokenizer").Tokenizer;
 var TextHighlightRules = require("./text_highlight_rules").TextHighlightRules;
@@ -7537,15 +7344,8 @@ var Mode = function() {
         this.$modes = {};
         for (var i in mapping) {
             if (mapping[i]) {
-                var Mode = mapping[i];
-                var id = Mode.prototype.$id;
-                var mode = config.$modes[id];
-                if (!mode)
-                    config.$modes[id] = mode = new Mode();
-                if (!config.$modes[i])
-                    config.$modes[i] = mode;
                 this.$embeds.push(i);
-                this.$modes[i] = mode;
+                this.$modes[i] = new mapping[i]();
             }
         }
 
@@ -7565,16 +7365,8 @@ var Mode = function() {
 
     this.$delegator = function(method, args, defaultHandler) {
         var state = args[0];
-        if (typeof state != "string") {
-            if (Array.isArray(state[2])) {
-                var language = state[2][state[2].length - 1];
-                var mode = this.$modes[language];
-                if (mode)
-                    return mode[method].apply(mode, [state[1]].concat([].slice.call(args, 1)));
-            }
+        if (typeof state != "string")
             state = state[0];
-        }
-            
         for (var i = 0; i < this.$embeds.length; i++) {
             if (!this.$modes[this.$embeds[i]]) continue;
 
@@ -7655,7 +7447,7 @@ var Mode = function() {
 exports.Mode = Mode;
 });
 
-ace.define("ace/apply_delta",["require","exports","module"], function(require, exports, module) {
+ace.define("ace/apply_delta",[], function(require, exports, module) {
 "use strict";
 
 function throwDeltaError(delta, errorText){
@@ -7719,7 +7511,7 @@ exports.applyDelta = function(docLines, delta, doNotValidate) {
 };
 });
 
-ace.define("ace/anchor",["require","exports","module","ace/lib/oop","ace/lib/event_emitter"], function(require, exports, module) {
+ace.define("ace/anchor",[], function(require, exports, module) {
 "use strict";
 
 var oop = require("./lib/oop");
@@ -7843,7 +7635,7 @@ var Anchor = exports.Anchor = function(doc, row, column) {
 
 });
 
-ace.define("ace/document",["require","exports","module","ace/lib/oop","ace/apply_delta","ace/lib/event_emitter","ace/range","ace/anchor"], function(require, exports, module) {
+ace.define("ace/document",[], function(require, exports, module) {
 "use strict";
 
 var oop = require("./lib/oop");
@@ -8198,7 +7990,7 @@ var Document = function(textOrLines) {
 exports.Document = Document;
 });
 
-ace.define("ace/background_tokenizer",["require","exports","module","ace/lib/oop","ace/lib/event_emitter"], function(require, exports, module) {
+ace.define("ace/background_tokenizer",[], function(require, exports, module) {
 "use strict";
 
 var oop = require("./lib/oop");
@@ -8345,7 +8137,7 @@ var BackgroundTokenizer = function(tokenizer, editor) {
 exports.BackgroundTokenizer = BackgroundTokenizer;
 });
 
-ace.define("ace/search_highlight",["require","exports","module","ace/lib/lang","ace/lib/oop","ace/range"], function(require, exports, module) {
+ace.define("ace/search_highlight",[], function(require, exports, module) {
 "use strict";
 
 var lang = require("./lib/lang");
@@ -8397,7 +8189,7 @@ var SearchHighlight = function(regExp, clazz, type) {
 exports.SearchHighlight = SearchHighlight;
 });
 
-ace.define("ace/edit_session/fold_line",["require","exports","module","ace/range"], function(require, exports, module) {
+ace.define("ace/edit_session/fold_line",[], function(require, exports, module) {
 "use strict";
 
 var Range = require("../range").Range;
@@ -8616,7 +8408,7 @@ function FoldLine(foldData, folds) {
 exports.FoldLine = FoldLine;
 });
 
-ace.define("ace/range_list",["require","exports","module","ace/range"], function(require, exports, module) {
+ace.define("ace/range_list",[], function(require, exports, module) {
 "use strict";
 var Range = require("./range").Range;
 var comparePoints = Range.comparePoints;
@@ -8865,7 +8657,7 @@ var RangeList = function() {
 exports.RangeList = RangeList;
 });
 
-ace.define("ace/edit_session/fold",["require","exports","module","ace/range","ace/range_list","ace/lib/oop"], function(require, exports, module) {
+ace.define("ace/edit_session/fold",[], function(require, exports, module) {
 "use strict";
 
 var Range = require("../range").Range;
@@ -8969,7 +8761,7 @@ function restoreRange(range, anchor) {
 
 });
 
-ace.define("ace/edit_session/folding",["require","exports","module","ace/range","ace/edit_session/fold_line","ace/edit_session/fold","ace/token_iterator"], function(require, exports, module) {
+ace.define("ace/edit_session/folding",[], function(require, exports, module) {
 "use strict";
 
 var Range = require("../range").Range;
@@ -9718,7 +9510,7 @@ exports.Folding = Folding;
 
 });
 
-ace.define("ace/edit_session/bracket_match",["require","exports","module","ace/token_iterator","ace/range"], function(require, exports, module) {
+ace.define("ace/edit_session/bracket_match",[], function(require, exports, module) {
 "use strict";
 
 var TokenIterator = require("../token_iterator").TokenIterator;
@@ -9900,7 +9692,7 @@ exports.BracketMatch = BracketMatch;
 
 });
 
-ace.define("ace/edit_session",["require","exports","module","ace/lib/oop","ace/lib/lang","ace/bidihandler","ace/config","ace/lib/event_emitter","ace/selection","ace/mode/text","ace/range","ace/document","ace/background_tokenizer","ace/search_highlight","ace/edit_session/folding","ace/edit_session/bracket_match"], function(require, exports, module) {
+ace.define("ace/edit_session",[], function(require, exports, module) {
 "use strict";
 
 var oop = require("./lib/oop");
@@ -9934,9 +9726,9 @@ var EditSession = function(text, mode) {
     if (typeof text != "object" || !text.getLine)
         text = new Document(text);
 
+    this.$bidiHandler = new BidiHandler(this);
     this.setDocument(text);
     this.selection = new Selection(this);
-    this.$bidiHandler = new BidiHandler(this);
 
     config.resetOptions(this);
     this.setMode(mode);
@@ -10331,7 +10123,7 @@ EditSession.$uid = 0;
         this._signal("tokenizerUpdate", e);
     };
 
-    this.$modes = config.$modes;
+    this.$modes = {};
     this.$mode = null;
     this.$modeId = null;
     this.setMode = function(mode, cb) {
@@ -11055,11 +10847,15 @@ EditSession.$uid = 0;
             return Math.min(indentation, maxIndent);
         }
         function addSplit(screenPos) {
-            var len = screenPos - lastSplit;
-            for (var i = lastSplit; i < screenPos; i++) {
-                var ch = tokens[i];
-                if (ch === 12 || ch === 2) len -= 1;
-            }
+            var displayed = tokens.slice(lastSplit, screenPos);
+            var len = displayed.length;
+            displayed.join("")
+                .replace(/12/g, function() {
+                    len -= 1;
+                })
+                .replace(/2/g, function() {
+                    len -= 1;
+                });
 
             if (!splits.length) {
                 indent = getWrapIndent();
@@ -11565,22 +11361,15 @@ config.defineOptions(EditSession.prototype, "session", {
             if (val != this.$wrapAsCode) {
                 this.$wrapAsCode = val;
                 if (this.$useWrapMode) {
-                    this.$useWrapMode = false;
-                    this.setUseWrapMode(true);
+                    this.$modified = true;
+                    this.$resetRowCache(0);
+                    this.$updateWrapData(0, this.getLength() - 1);
                 }
             }
         },
         initialValue: "auto"
     },
-    indentedSoftWrap: {
-        set: function() {
-            if (this.$useWrapMode) {
-                this.$useWrapMode = false;
-                this.setUseWrapMode(true);
-            }
-        },
-        initialValue: true 
-    },
+    indentedSoftWrap: { initialValue: true },
     firstLineNumber: {
         set: function() {this._signal("changeBreakpoint");},
         initialValue: 1
@@ -11632,7 +11421,7 @@ config.defineOptions(EditSession.prototype, "session", {
 exports.EditSession = EditSession;
 });
 
-ace.define("ace/search",["require","exports","module","ace/lib/lang","ace/lib/oop","ace/range"], function(require, exports, module) {
+ace.define("ace/search",[], function(require, exports, module) {
 "use strict";
 
 var lang = require("./lib/lang");
@@ -11940,7 +11729,7 @@ function addWordBoundary(needle, options) {
 exports.Search = Search;
 });
 
-ace.define("ace/keyboard/hash_handler",["require","exports","module","ace/lib/keys","ace/lib/useragent"], function(require, exports, module) {
+ace.define("ace/keyboard/hash_handler",[], function(require, exports, module) {
 "use strict";
 
 var keyUtil = require("../lib/keys");
@@ -12161,7 +11950,7 @@ exports.HashHandler = HashHandler;
 exports.MultiHashHandler = MultiHashHandler;
 });
 
-ace.define("ace/commands/command_manager",["require","exports","module","ace/lib/oop","ace/keyboard/hash_handler","ace/lib/event_emitter"], function(require, exports, module) {
+ace.define("ace/commands/command_manager",[], function(require, exports, module) {
 "use strict";
 
 var oop = require("../lib/oop");
@@ -12199,7 +11988,7 @@ oop.inherits(CommandManager, MultiHashHandler);
         if (editor && editor.$readOnly && !command.readOnly)
             return false;
 
-        if (this.$checkCommandState != false && command.isAvailable && !command.isAvailable(editor))
+        if (command.isAvailable && !command.isAvailable(editor))
             return false;
 
         var e = {editor: editor, command: command, args: args};
@@ -12271,7 +12060,7 @@ exports.CommandManager = CommandManager;
 
 });
 
-ace.define("ace/commands/default_commands",["require","exports","module","ace/lib/lang","ace/config","ace/range"], function(require, exports, module) {
+ace.define("ace/commands/default_commands",[], function(require, exports, module) {
 "use strict";
 
 var lang = require("../lib/lang");
@@ -12985,14 +12774,14 @@ exports.commands = [{
 
 });
 
-ace.define("ace/clipboard",["require","exports","module"], function(require, exports, module) {
+ace.define("ace/clipboard",[], function(require, exports, module) {
 "use strict";
 
 module.exports = { lineMode: false };
 
 });
 
-ace.define("ace/editor",["require","exports","module","ace/lib/fixoldbrowsers","ace/lib/oop","ace/lib/dom","ace/lib/lang","ace/lib/useragent","ace/keyboard/textinput","ace/mouse/mouse_handler","ace/mouse/fold_handler","ace/keyboard/keybinding","ace/edit_session","ace/search","ace/range","ace/lib/event_emitter","ace/commands/command_manager","ace/commands/default_commands","ace/config","ace/token_iterator","ace/clipboard"], function(require, exports, module) {
+ace.define("ace/editor",[], function(require, exports, module) {
 "use strict";
 
 require("./lib/fixoldbrowsers");
@@ -13067,7 +12856,7 @@ Editor.$uid = 0;
         this.commands.on("exec", this.startOperation.bind(this), true);
         this.commands.on("afterExec", this.endOperation.bind(this), true);
 
-        this.$opResetTimer = lang.delayedCall(this.endOperation.bind(this, true));
+        this.$opResetTimer = lang.delayedCall(this.endOperation.bind(this));
         this.on("change", function() {
             if (!this.curOp) {
                 this.startOperation();
@@ -13087,21 +12876,21 @@ Editor.$uid = 0;
 
     this.curOp = null;
     this.prevOp = {};
-    this.startOperation = function(commandEvent) {
+    this.startOperation = function(commadEvent) {
         if (this.curOp) {
-            if (!commandEvent || this.curOp.command)
+            if (!commadEvent || this.curOp.command)
                 return;
             this.prevOp = this.curOp;
         }
-        if (!commandEvent) {
+        if (!commadEvent) {
             this.previousCommand = null;
-            commandEvent = {};
+            commadEvent = {};
         }
 
         this.$opResetTimer.schedule();
         this.curOp = this.session.curOp = {
-            command: commandEvent.command || {},
-            args: commandEvent.args,
+            command: commadEvent.command || {},
+            args: commadEvent.args,
             scrollTop: this.renderer.scrollTop
         };
         this.curOp.selectionBefore = this.selection.toJSON();
@@ -13111,10 +12900,7 @@ Editor.$uid = 0;
         if (this.curOp) {
             if (e && e.returnValue === false)
                 return (this.curOp = null);
-            if (e == true && this.curOp.command && this.curOp.command.name == "mouse")
-                return;
             this._signal("beforeEndOperation");
-            if (!this.curOp) return;
             var command = this.curOp.command;
             var scrollIntoView = command && command.scrollIntoView;
             if (scrollIntoView) {
@@ -13783,36 +13569,8 @@ Editor.$uid = 0;
             mode.autoOutdent(lineState, session, cursor.row);
     };
 
-    this.onTextInput = function(text, composition) {
-        if (!composition)
-            return this.keyBinding.onTextInput(text);
-        
-        this.startOperation({command: { name: "insertstring" }});
-        var applyComposition = this.applyComposition.bind(this, text, composition);
-        if (this.selection.rangeCount)
-            this.forEachSelection(applyComposition);
-        else
-            applyComposition();
-        this.endOperation();
-    };
-    
-    this.applyComposition = function(text, composition) {
-        if (composition.extendLeft || composition.extendRight) {
-            var r = this.selection.getRange();
-            r.start.column -= composition.extendLeft;
-            r.end.column += composition.extendRight;
-            this.selection.setRange(r);
-            if (!text && !r.isEmpty())
-                this.remove();
-        }
-        if (text || !this.selection.isEmpty())
-            this.insert(text, true);
-        if (composition.restoreStart || composition.restoreEnd) {
-            var r = this.selection.getRange();
-            r.start.column -= composition.restoreStart;
-            r.end.column -= composition.restoreEnd;
-            this.selection.setRange(r);
-        }
+    this.onTextInput = function(text) {
+        this.keyBinding.onTextInput(text);
     };
 
     this.onCommandKey = function(e, hashId, keyCode) {
@@ -14177,84 +13935,6 @@ Editor.$uid = 0;
                 this.moveCursorTo(row, Math.max(nr.start +1, column + nnr.length - nr.value.length));
 
             }
-        } else {
-            this.toggleWord();
-        }
-    };
-
-    this.$toggleWordPairs = [
-        ["first", "last"],
-        ["true", "false"],
-        ["yes", "no"],
-        ["width", "height"],
-        ["top", "bottom"],
-        ["right", "left"],
-        ["on", "off"],
-        ["x", "y"],
-        ["get", "set"],
-        ["max", "min"],
-        ["horizontal", "vertical"],
-        ["show", "hide"],
-        ["add", "remove"],
-        ["up", "down"],
-        ["before", "after"],
-        ["even", "odd"],
-        ["inside", "outside"],
-        ["next", "previous"],
-        ["increase", "decrease"],
-        ["attach", "detach"],
-        ["&&", "||"],
-        ["==", "!="]
-    ];
-
-    this.toggleWord = function () {
-        var row = this.selection.getCursor().row;
-        var column = this.selection.getCursor().column;
-        this.selection.selectWord();
-        var currentState = this.getSelectedText();
-        var currWordStart = this.selection.getWordRange().start.column;
-        var wordParts = currentState.replace(/([a-z]+|[A-Z]+)(?=[A-Z_]|$)/g, '$1 ').split(/\s/);
-        var delta = column - currWordStart - 1;
-        if (delta < 0) delta = 0;
-        var curLength = 0, itLength = 0;
-        var that = this;
-        if (currentState.match(/[A-Za-z0-9_]+/)) {
-            wordParts.forEach(function (item, i) {
-                itLength = curLength + item.length;
-                if (delta >= curLength && delta <= itLength) {
-                    currentState = item;
-                    that.selection.clearSelection();
-                    that.moveCursorTo(row, curLength + currWordStart);
-                    that.selection.selectTo(row, itLength + currWordStart);
-                }
-                curLength = itLength;
-            });
-        }
-
-        var wordPairs = this.$toggleWordPairs;
-        var reg;
-        for (var i = 0; i < wordPairs.length; i++) {
-            var item = wordPairs[i];
-            for (var j = 0; j <= 1; j++) {
-                var negate = +!j;
-                var firstCondition = currentState.match(new RegExp('^\\s?_?(' + lang.escapeRegExp(item[j]) + ')\\s?$', 'i'));
-                if (firstCondition) {
-                    var secondCondition = currentState.match(new RegExp('([_]|^|\\s)(' + lang.escapeRegExp(firstCondition[1]) + ')($|\\s)', 'g'));
-                    if (secondCondition) {
-                        reg = currentState.replace(new RegExp(lang.escapeRegExp(item[j]), 'i'), function (result) {
-                            var res = item[negate];
-                            if (result.toUpperCase() == result) {
-                                res = res.toUpperCase();
-                            } else if (result.charAt(0).toUpperCase() == result.charAt(0)) {
-                                res = res.substr(0, 0) + item[negate].charAt(0).toUpperCase() + res.substr(1);
-                            }
-                            return res;
-                        });
-                        this.insert(reg);
-                        reg = "";
-                    }
-                }
-            }
         }
     };
     this.removeLines = function() {
@@ -14353,8 +14033,8 @@ Editor.$uid = 0;
         };
     };
 
-    this.onCompositionStart = function(compositionState) {
-        this.renderer.showComposition(compositionState);
+    this.onCompositionStart = function(text) {
+        this.renderer.showComposition(this.getCursorPosition());
     };
 
     this.onCompositionUpdate = function(text) {
@@ -14938,26 +14618,6 @@ config.defineOptions(Editor.prototype, "editor", {
         handlesSet: true,
         hidden: true
     },
-    
-    showLineNumbers: {
-        set: function(show) {
-            this.renderer.$gutterLayer.setShowLineNumbers(show);
-            this.renderer.$loop.schedule(this.renderer.CHANGE_GUTTER);
-            if (show && this.$relativeLineNumbers)
-                relativeNumberRenderer.attach(this);
-            else
-                relativeNumberRenderer.detach(this);
-        },
-        initialValue: true
-    },
-    relativeLineNumbers: {
-        set: function(value) {
-            if (this.$showLineNumbers && value)
-                relativeNumberRenderer.attach(this);
-            else
-                relativeNumberRenderer.detach(this);
-        }
-    },
 
     hScrollBarAlwaysVisible: "renderer",
     vScrollBarAlwaysVisible: "renderer",
@@ -14969,8 +14629,9 @@ config.defineOptions(Editor.prototype, "editor", {
     printMargin: "renderer",
     fadeFoldWidgets: "renderer",
     showFoldWidgets: "renderer",
-    displayIndentGuides: "renderer",
+    showLineNumbers: "renderer",
     showGutter: "renderer",
+    displayIndentGuides: "renderer",
     fontSize: "renderer",
     fontFamily: "renderer",
     maxLines: "renderer",
@@ -14980,7 +14641,6 @@ config.defineOptions(Editor.prototype, "editor", {
     theme: "renderer",
     hasCssTransforms: "renderer",
     maxPixelHeight: "renderer",
-    useTextareaForIME: "renderer",
 
     scrollSpeed: "$mouseHandler",
     dragDelay: "$mouseHandler",
@@ -15001,38 +14661,10 @@ config.defineOptions(Editor.prototype, "editor", {
     mode: "session"
 });
 
-
-var relativeNumberRenderer = {
-    getText: function(session, row) {
-        return (Math.abs(session.selection.lead.row - row) || (row + 1 + (row < 9 ? "\xb7" : ""))) + "";
-    },
-    getWidth: function(session, lastLineNumber, config) {
-        return Math.max(
-            lastLineNumber.toString().length,
-            (config.lastRow + 1).toString().length,
-            2
-        ) * config.characterWidth;
-    },
-    update: function(e, editor) {
-        editor.renderer.$loop.schedule(editor.renderer.CHANGE_GUTTER);
-    },
-    attach: function(editor) {
-        editor.renderer.$gutterLayer.$renderer = this;
-        editor.on("changeSelection", this.update);
-        this.update(null, editor);
-    },
-    detach: function(editor) {
-        if (editor.renderer.$gutterLayer.$renderer == this)
-            editor.renderer.$gutterLayer.$renderer = null;
-        editor.off("changeSelection", this.update);
-        this.update(null, editor);
-    }
-};
-
 exports.Editor = Editor;
 });
 
-ace.define("ace/undomanager",["require","exports","module","ace/range"], function(require, exports, module) {
+ace.define("ace/undomanager",[], function(require, exports, module) {
 "use strict";
 var UndoManager = function() {
     this.$maxRev = 0;
@@ -15512,141 +15144,13 @@ exports.UndoManager = UndoManager;
 
 });
 
-ace.define("ace/layer/lines",["require","exports","module","ace/lib/dom"], function(require, exports, module) {
-"use strict";
-
-var dom = require("../lib/dom");
-
-var Lines = function(element, canvasHeight) {
-    this.element = element;
-    this.canvasHeight = canvasHeight || 500000;
-    this.element.style.height = (this.canvasHeight * 2) + "px";
-    
-    this.cells = [];
-    this.cellCache = [];
-    this.$offsetCoefficient = 0;
-};
-
-(function() {
-    
-    this.moveContainer = function(config) {
-        dom.translate(this.element, 0, -((config.firstRowScreen * config.lineHeight) % this.canvasHeight) - config.offset * this.$offsetCoefficient);
-    };    
-    
-    this.pageChanged = function(oldConfig, newConfig) {
-        return (
-            Math.floor((oldConfig.firstRowScreen * oldConfig.lineHeight) / this.canvasHeight) !==
-            Math.floor((newConfig.firstRowScreen * newConfig.lineHeight) / this.canvasHeight)
-        );
-    };
-    
-    this.computeLineTop = function(row, config, session) {
-        var screenTop = config.firstRowScreen * config.lineHeight;
-        var screenPage = Math.floor(screenTop / this.canvasHeight);
-        var lineTop = session.documentToScreenRow(row, 0) * config.lineHeight;
-        return lineTop - (screenPage * this.canvasHeight);
-    };
-    
-    this.computeLineHeight = function(row, config, session) {
-        return config.lineHeight * session.getRowLength(row);
-    };
-    
-    this.getLength = function() {
-        return this.cells.length;
-    };
-    
-    this.get = function(index) {
-        return this.cells[index];
-    };
-    
-    this.shift = function() {
-        this.$cacheCell(this.cells.shift());
-    };
-    
-    this.pop = function() {
-        this.$cacheCell(this.cells.pop());
-    };
-    
-    this.push = function(cell) {
-        if (Array.isArray(cell)) {
-            this.cells.push.apply(this.cells, cell);
-            var fragment = dom.createFragment(this.element);
-            for (var i=0; i<cell.length; i++) {
-                fragment.appendChild(cell[i].element);
-            }
-            this.element.appendChild(fragment);
-         } else {
-            this.cells.push(cell);
-            this.element.appendChild(cell.element);
-         }
-    };
-    
-    this.unshift = function(cell) {
-        if (Array.isArray(cell)) {
-            this.cells.unshift.apply(this.cells, cell);
-            var fragment = dom.createFragment(this.element);
-            for (var i=0; i<cell.length; i++) {
-                fragment.appendChild(cell[i].element);
-            }
-            if (this.element.firstChild)
-                this.element.insertBefore(fragment, this.element.firstChild);
-            else
-                this.element.appendChild(fragment);
-         } else {
-            this.cells.unshift(cell);
-            this.element.insertAdjacentElement("afterbegin", cell.element);
-         }
-    };
-    
-    this.last = function() {
-        if (this.cells.length)
-            return this.cells[this.cells.length-1];
-        else
-            return null;
-    };
-    
-    this.$cacheCell = function(cell) {
-        if (!cell)
-            return;
-            
-        cell.element.remove();
-        this.cellCache.push(cell);
-    };
-    
-    this.createCell = function(row, config, session, initElement) {
-        var cell = this.cellCache.pop();
-        if (!cell) {
-            var element = dom.createElement("div");
-            if (initElement)
-                initElement(element);
-            
-            this.element.appendChild(element);
-            
-            cell = {
-                element: element,
-                text: "",
-                row: row
-            };
-        }
-        cell.row = row;
-        
-        return cell;
-    };
-    
-}).call(Lines.prototype);
-
-exports.Lines = Lines;
-
-});
-
-ace.define("ace/layer/gutter",["require","exports","module","ace/lib/dom","ace/lib/oop","ace/lib/lang","ace/lib/event_emitter","ace/layer/lines"], function(require, exports, module) {
+ace.define("ace/layer/gutter",[], function(require, exports, module) {
 "use strict";
 
 var dom = require("../lib/dom");
 var oop = require("../lib/oop");
 var lang = require("../lib/lang");
 var EventEmitter = require("../lib/event_emitter").EventEmitter;
-var Lines = require("./lines").Lines;
 
 var Gutter = function(parentEl) {
     this.element = dom.createElement("div");
@@ -15658,9 +15162,8 @@ var Gutter = function(parentEl) {
 
     this.$annotations = [];
     this.$updateAnnotations = this.$updateAnnotations.bind(this);
-    
-    this.$lines = new Lines(this.element);
-    this.$lines.$offsetCoefficient = 1;
+
+    this.$cells = [];
 };
 
 (function() {
@@ -15675,13 +15178,13 @@ var Gutter = function(parentEl) {
             session.on("change", this.$updateAnnotations);
     };
 
-    this.addGutterDecoration = function(row, className) {
+    this.addGutterDecoration = function(row, className){
         if (window.console)
             console.warn && console.warn("deprecated use session.addGutterDecoration");
         this.session.addGutterDecoration(row, className);
     };
 
-    this.removeGutterDecoration = function(row, className) {
+    this.removeGutterDecoration = function(row, className){
         if (window.console)
             console.warn && console.warn("deprecated use session.removeGutterDecoration");
         this.session.removeGutterDecoration(row, className);
@@ -15728,26 +15231,23 @@ var Gutter = function(parentEl) {
     };
 
     this.update = function(config) {
-        this.config = config;
-        
         var session = this.session;
         var firstRow = config.firstRow;
         var lastRow = Math.min(config.lastRow + config.gutterOffset,  // needed to compensate for hor scollbar
             session.getLength() - 1);
-            
-        this.oldLastRow = lastRow;
-        this.config = config;
-        
-        this.$lines.moveContainer(config);
-        this.$updateCursorRow();
-            
         var fold = session.getNextFoldLine(firstRow);
         var foldStart = fold ? fold.start.row : Infinity;
+        var foldWidgets = this.$showFoldWidgets && session.foldWidgets;
+        var breakpoints = session.$breakpoints;
+        var decorations = session.$decorations;
+        var firstLineNumber = session.$firstLineNumber;
+        var lastLineNumber = 0;
+        
+        var gutterRenderer = session.gutterRenderer || this.$renderer;
 
         var cell = null;
         var index = -1;
         var row = firstRow;
-        
         while (true) {
             if (row > foldStart) {
                 row = fold.end.row + 1;
@@ -15755,243 +15255,94 @@ var Gutter = function(parentEl) {
                 foldStart = fold ? fold.start.row : Infinity;
             }
             if (row > lastRow) {
-                while (this.$lines.getLength() > index + 1)
-                    this.$lines.pop();
-                    
+                while (this.$cells.length > index + 1) {
+                    cell = this.$cells.pop();
+                    this.element.removeChild(cell.element);
+                }
                 break;
             }
 
-            cell = this.$lines.get(++index);
-            if (cell) {
-                cell.row = row;
-            } else {
-                cell = this.$lines.createCell(row, config, this.session, onCreateCell);
-                this.$lines.push(cell);
+            cell = this.$cells[++index];
+            if (!cell) {
+                cell = {element: null, textNode: null, foldWidget: null};
+                cell.element = dom.createElement("div");
+                cell.textNode = document.createTextNode('');
+                cell.element.appendChild(cell.textNode);
+                this.element.appendChild(cell.element);
+                this.$cells[index] = cell;
             }
 
-            this.$renderCell(cell, config, fold, row);
+            var className = "ace_gutter-cell ";
+            if (breakpoints[row])
+                className += breakpoints[row];
+            if (decorations[row])
+                className += decorations[row];
+            if (this.$annotations[row])
+                className += this.$annotations[row].className;
+            if (cell.element.className != className)
+                cell.element.className = className;
+
+            var height = session.getRowLength(row) * config.lineHeight + "px";
+            if (height != cell.element.style.height)
+                cell.element.style.height = height;
+
+            if (foldWidgets) {
+                var c = foldWidgets[row];
+                if (c == null)
+                    c = foldWidgets[row] = session.getFoldWidget(row);
+            }
+
+            if (c) {
+                if (!cell.foldWidget) {
+                    cell.foldWidget = dom.createElement("span");
+                    cell.element.appendChild(cell.foldWidget);
+                }
+                var className = "ace_fold-widget ace_" + c;
+                if (c == "start" && row == foldStart && row < fold.end.row)
+                    className += " ace_closed";
+                else
+                    className += " ace_open";
+                if (cell.foldWidget.className != className)
+                    cell.foldWidget.className = className;
+
+                var height = config.lineHeight + "px";
+                if (cell.foldWidget.style.height != height)
+                    cell.foldWidget.style.height = height;
+            } else {
+                if (cell.foldWidget) {
+                    cell.element.removeChild(cell.foldWidget);
+                    cell.foldWidget = null;
+                }
+            }
+            
+            var text = lastLineNumber = gutterRenderer
+                ? gutterRenderer.getText(session, row)
+                : row + firstLineNumber;
+            if (text !== cell.textNode.data)
+                cell.textNode.data = text;
+
             row++;
         }
-        
-        this._signal("afterRender");
-        this.$updateGutterWidth(config);
-    };
 
-    this.$updateGutterWidth = function(config) {
-        var session = this.session;
-        
-        var gutterRenderer = session.gutterRenderer || this.$renderer;
-        
-        var firstLineNumber = session.$firstLineNumber;
-        var lastLineText = this.$lines.last() ? this.$lines.last().text : "";
-        
+        this.element.style.height = config.minHeight + "px";
+
         if (this.$fixedWidth || session.$useWrapMode)
-            lastLineText = session.getLength() + firstLineNumber;
+            lastLineNumber = session.getLength() + firstLineNumber;
 
         var gutterWidth = gutterRenderer 
-            ? gutterRenderer.getWidth(session, lastLineText, config)
-            : lastLineText.toString().length * config.characterWidth;
+            ? gutterRenderer.getWidth(session, lastLineNumber, config)
+            : lastLineNumber.toString().length * config.characterWidth;
         
         var padding = this.$padding || this.$computePadding();
         gutterWidth += padding.left + padding.right;
         if (gutterWidth !== this.gutterWidth && !isNaN(gutterWidth)) {
             this.gutterWidth = gutterWidth;
-            this.element.parentNode.style.width = 
             this.element.style.width = Math.ceil(this.gutterWidth) + "px";
-            this._signal("changeGutterWidth", gutterWidth);
+            this._emit("changeGutterWidth", gutterWidth);
         }
-    };
-    
-    this.$updateCursorRow = function() {
-        if (!this.$highlightGutterLine)
-            return;
-            
-        var position = this.session.selection.getCursor();
-        if (this.$cursorRow === position.row)
-            return;
-        
-        this.$cursorRow = position.row;
-    };
-    
-    this.updateLineHighlight = function() {
-        if (!this.$highlightGutterLine)
-            return;
-        var row = this.session.selection.cursor.row;
-        this.$cursorRow = row;
-
-        if (this.$cursorCell && this.$cursorCell.row == row)
-            return;
-        if (this.$cursorCell)
-            this.$cursorCell.element.className = this.$cursorCell.element.className.replace("ace_gutter-active-line ", "");
-        var cells = this.$lines.cells;
-        this.$cursorCell = null;
-        for (var i = 0; i < cells.length; i++) {
-            var cell = cells[i];
-            if (cell.row >= this.$cursorRow) {
-                if (cell.row > this.$cursorRow) {
-                    var fold = this.session.getFoldLine(this.$cursorRow);
-                    if (i > 0 && fold && fold.start.row == cells[i - 1].row)
-                        cell = cells[i - 1];
-                    else
-                        break;
-                }
-                cell.element.className = "ace_gutter-active-line " + cell.element.className;
-                this.$cursorCell = cell;
-                break;
-            }
-        }
-    };
-    
-    this.scrollLines = function(config) {
-        var oldConfig = this.config;
-        this.config = config;
-        
-        this.$updateCursorRow();
-        if (this.$lines.pageChanged(oldConfig, config))
-            return this.update(config);
-        
-        this.$lines.moveContainer(config);
-
-        var lastRow = Math.min(config.lastRow + config.gutterOffset,  // needed to compensate for hor scollbar
-            this.session.getLength() - 1);
-        var oldLastRow = this.oldLastRow;
-        this.oldLastRow = lastRow;
-        
-        if (!oldConfig || oldLastRow < config.firstRow)
-            return this.update(config);
-
-        if (lastRow < oldConfig.firstRow)
-            return this.update(config);
-
-        if (oldConfig.firstRow < config.firstRow)
-            for (var row=this.session.getFoldedRowCount(oldConfig.firstRow, config.firstRow - 1); row>0; row--)
-                this.$lines.shift();
-
-        if (oldLastRow > lastRow)
-            for (var row=this.session.getFoldedRowCount(lastRow + 1, oldLastRow); row>0; row--)
-                this.$lines.pop();
-
-        if (config.firstRow < oldConfig.firstRow) {
-            this.$lines.unshift(this.$renderLines(config, config.firstRow, oldConfig.firstRow - 1));
-        }
-
-        if (lastRow > oldLastRow) {
-            this.$lines.push(this.$renderLines(config, oldLastRow + 1, lastRow));
-        }
-        
-        this.updateLineHighlight();
-        
-        this._signal("afterRender");
-        this.$updateGutterWidth(config);
-    };
-
-    this.$renderLines = function(config, firstRow, lastRow) {
-        var fragment = [];
-        var row = firstRow;
-        var foldLine = this.session.getNextFoldLine(row);
-        var foldStart = foldLine ? foldLine.start.row : Infinity;
-
-        while (true) {
-            if (row > foldStart) {
-                row = foldLine.end.row+1;
-                foldLine = this.session.getNextFoldLine(row, foldLine);
-                foldStart = foldLine ? foldLine.start.row : Infinity;
-            }
-            if (row > lastRow)
-                break;
-
-            var cell = this.$lines.createCell(row, config, this.session, onCreateCell);
-            this.$renderCell(cell, config, foldLine, row);
-            fragment.push(cell);
-
-            row++;
-        }
-        return fragment;
-    };
-    
-    this.$renderCell = function(cell, config, fold, row) {
-        var element = cell.element;
-        
-        var session = this.session;
-        
-        var textNode = element.childNodes[0];
-        var foldWidget = element.childNodes[1];
-
-        var firstLineNumber = session.$firstLineNumber;
-        
-        var breakpoints = session.$breakpoints;
-        var decorations = session.$decorations;
-        var gutterRenderer = session.gutterRenderer || this.$renderer;
-        var foldWidgets = this.$showFoldWidgets && session.foldWidgets;
-        var foldStart = fold ? fold.start.row : Number.MAX_VALUE;
-        
-        var className = "ace_gutter-cell ";
-        if (this.$highlightGutterLine) {
-            if (row == this.$cursorRow || (fold && row < this.$cursorRow && row >= foldStart &&  this.$cursorRow <= fold.end.row)) {
-                className += "ace_gutter-active-line ";
-                if (this.$cursorCell != cell) {
-                    if (this.$cursorCell)
-                        this.$cursorCell.element.className = this.$cursorCell.element.className.replace("ace_gutter-active-line ", "");
-                    this.$cursorCell = cell;
-                }
-            }
-        }
-        
-        if (breakpoints[row])
-            className += breakpoints[row];
-        if (decorations[row])
-            className += decorations[row];
-        if (this.$annotations[row])
-            className += this.$annotations[row].className;
-        if (element.className != className)
-            element.className = className;
-
-        if (foldWidgets) {
-            var c = foldWidgets[row];
-            if (c == null)
-                c = foldWidgets[row] = session.getFoldWidget(row);
-        }
-
-        if (c) {
-            var className = "ace_fold-widget ace_" + c;
-            if (c == "start" && row == foldStart && row < fold.end.row)
-                className += " ace_closed";
-            else
-                className += " ace_open";
-            if (foldWidget.className != className)
-                foldWidget.className = className;
-
-            var foldHeight = config.lineHeight + "px";
-            dom.setStyle(foldWidget.style, "height", foldHeight);
-            dom.setStyle(foldWidget.style, "display", "inline-block");
-        } else {
-            if (foldWidget) {
-                dom.setStyle(foldWidget.style, "display", "none");
-            }
-        }
-        
-        var text = (gutterRenderer
-            ? gutterRenderer.getText(session, row)
-            : row + firstLineNumber).toString();
-            
-        if (text !== textNode.data) {
-            textNode.data = text;
-        }
-        
-        dom.setStyle(cell.element.style, "height", this.$lines.computeLineHeight(row, config, session) + "px");
-        dom.setStyle(cell.element.style, "top", this.$lines.computeLineTop(row, config, session) + "px");
-        
-        cell.text = text;
-        return cell;
     };
 
     this.$fixedWidth = false;
-    
-    this.$highlightGutterLine = true;
-    this.$renderer = "";
-    this.setHighlightGutterLine = function(highlightGutterLine) {
-        this.$highlightGutterLine = highlightGutterLine;
-    };
     
     this.$showLineNumbers = true;
     this.$renderer = "";
@@ -16026,10 +15377,8 @@ var Gutter = function(parentEl) {
             return {left: 0, right: 0};
         var style = dom.computedStyle(this.element.firstChild);
         this.$padding = {};
-        this.$padding.left = (parseInt(style.borderLeftWidth) || 0)
-            + (parseInt(style.paddingLeft) || 0) + 1;
-        this.$padding.right = (parseInt(style.borderRightWidth) || 0)
-            + (parseInt(style.paddingRight) || 0);
+        this.$padding.left = parseInt(style.paddingLeft) + 1 || 0;
+        this.$padding.right = parseInt(style.paddingRight) || 0;
         return this.$padding;
     };
 
@@ -16044,21 +15393,11 @@ var Gutter = function(parentEl) {
 
 }).call(Gutter.prototype);
 
-function onCreateCell(element) {
-    var textNode = document.createTextNode('');
-    element.appendChild(textNode);
-    
-    var foldWidget = dom.createElement("span");
-    element.appendChild(foldWidget);
-    
-    return element;
-}
-
 exports.Gutter = Gutter;
 
 });
 
-ace.define("ace/layer/marker",["require","exports","module","ace/range","ace/lib/dom"], function(require, exports, module) {
+ace.define("ace/layer/marker",[], function(require, exports, module) {
 "use strict";
 
 var Range = require("../range").Range;
@@ -16084,27 +15423,14 @@ var Marker = function(parentEl) {
     this.setMarkers = function(markers) {
         this.markers = markers;
     };
-    
-    this.elt = function(className, css) {
-        var x = this.i != -1 && this.element.childNodes[this.i];
-        if (!x) {
-            x = document.createElement("div");
-            this.element.appendChild(x);
-            this.i = -1;
-        } else {
-            this.i++;
-        }
-        x.style.cssText = css;
-        x.className = className;
-    };
 
     this.update = function(config) {
         if (!config) return;
 
         this.config = config;
 
-        this.i = 0;
-        var html;
+
+        var html = [];
         for (var key in this.markers) {
             var marker = this.markers[key];
 
@@ -16119,7 +15445,9 @@ var Marker = function(parentEl) {
             range = range.toScreenRange(this.session);
             if (marker.renderer) {
                 var top = this.$getTop(range.start.row, config);
-                var left = this.$padding + range.start.column * config.characterWidth;
+                var left = this.$padding + (this.session.$bidiHandler.isBidiRow(range.start.row)
+                    ? this.session.$bidiHandler.getPosLeft(range.start.column)
+                    : range.start.column * config.characterWidth);
                 marker.renderer(html, range, left, top, config);
             } else if (marker.type == "fullLine") {
                 this.drawFullLineMarker(html, range, marker.clazz, config);
@@ -16131,13 +15459,14 @@ var Marker = function(parentEl) {
                 else
                     this.drawMultiLineMarker(html, range, marker.clazz, config);
             } else {
-                this.drawSingleLineMarker(html, range, marker.clazz + " ace_start" + " ace_br15", config);
+                if (this.session.$bidiHandler.isBidiRow(range.start.row)) {
+                    this.drawBidiSingleLineMarker(html, range, marker.clazz + " ace_start" + " ace_br15", config);
+                } else {
+                    this.drawSingleLineMarker(html, range, marker.clazz + " ace_start" + " ace_br15", config);
+                }
             }
         }
-        if (this.i !=-1) {
-            while (this.i < this.element.childElementCount)
-                this.element.removeChild(this.element.lastChild);
-        }
+        this.element.innerHTML = html.join("");
     };
 
     this.$getTop = function(row, layerConfig) {
@@ -16155,6 +15484,7 @@ var Marker = function(parentEl) {
         var prev = 0; 
         var curr = 0;
         var next = session.getScreenLastRowColumn(row);
+        var clazzModified = null;
         var lineRange = new Range(row, range.start.column, row, curr);
         for (; row <= end; row++) {
             lineRange.start.row = lineRange.end.row = row;
@@ -16163,29 +15493,38 @@ var Marker = function(parentEl) {
             prev = curr;
             curr = next;
             next = row + 1 < end ? session.getScreenLastRowColumn(row + 1) : row == end ? 0 : range.end.column;
-            this.drawSingleLineMarker(stringBuilder, lineRange, 
-                clazz + (row == start  ? " ace_start" : "") + " ace_br"
-                    + getBorderClass(row == start || row == start + 1 && range.start.column, prev < curr, curr > next, row == end),
-                layerConfig, row == end ? 0 : 1, extraStyle);
+            clazzModified = clazz + (row == start  ? " ace_start" : "") + " ace_br"
+                + getBorderClass(row == start || row == start + 1 && range.start.column, prev < curr, curr > next, row == end);
+            
+            if (this.session.$bidiHandler.isBidiRow(row)) {
+                this.drawBidiSingleLineMarker(stringBuilder, lineRange, clazzModified, 
+                    layerConfig, row == end ? 0 : 1, extraStyle);
+            } else {
+                this.drawSingleLineMarker(stringBuilder, lineRange, clazzModified,  
+                    layerConfig, row == end ? 0 : 1, extraStyle);
+            }
         }
     };
     this.drawMultiLineMarker = function(stringBuilder, range, clazz, config, extraStyle) {
         var padding = this.$padding;
-        var height = config.lineHeight;
-        var top = this.$getTop(range.start.row, config);
-        var left = padding + range.start.column * config.characterWidth;
+        var height, top, left;
         extraStyle = extraStyle || "";
-
-        if (this.session.$bidiHandler.isBidiRow(range.start.row)) {
+       if (this.session.$bidiHandler.isBidiRow(range.start.row)) {
            var range1 = range.clone();
            range1.end.row = range1.start.row;
            range1.end.column = this.session.getLine(range1.start.row).length;
            this.drawBidiSingleLineMarker(stringBuilder, range1, clazz + " ace_br1 ace_start", config, null, extraStyle);
         } else {
-            this.elt(
-                clazz + " ace_br1 ace_start",
-                "height:"+ height+ "px;"+ "right:0;"+ "top:"+top+ "px;left:"+ left+ "px;" + (extraStyle || "")
-            );
+           height = config.lineHeight;
+           top = this.$getTop(range.start.row, config);
+           left = padding + range.start.column * config.characterWidth;
+           stringBuilder.push(
+               "<div class='", clazz, " ace_br1 ace_start' style='",
+               "height:", height, "px;",
+               "right:0;",
+               "top:", top, "px;",
+               "left:", left, "px;", extraStyle, "'></div>"
+           );
         }
         if (this.session.$bidiHandler.isBidiRow(range.end.row)) {
            var range1 = range.clone();
@@ -16193,16 +15532,16 @@ var Marker = function(parentEl) {
            range1.start.column = 0;
            this.drawBidiSingleLineMarker(stringBuilder, range1, clazz + " ace_br12", config, null, extraStyle);
         } else {
-            top = this.$getTop(range.end.row, config);
-            var width = range.end.column * config.characterWidth;
-
-            this.elt(
-                clazz + " ace_br12",
-                "height:"+ height+ "px;"+
-                "width:"+ width+ "px;"+
-                "top:"+ top+ "px;"+
-                "left:"+ padding+ "px;"+ (extraStyle || "")
-            );
+           var width = range.end.column * config.characterWidth;
+           height = config.lineHeight;
+           top = this.$getTop(range.end.row, config);
+           stringBuilder.push(
+               "<div class='", clazz, " ace_br12' style='",
+               "height:", height, "px;",
+               "width:", width, "px;",
+               "top:", top, "px;",
+               "left:", padding, "px;", extraStyle, "'></div>"
+           );
         }
         height = (range.end.row - range.start.row - 1) * config.lineHeight;
         if (height <= 0)
@@ -16211,29 +15550,27 @@ var Marker = function(parentEl) {
         
         var radiusClass = (range.start.column ? 1 : 0) | (range.end.column ? 0 : 8);
 
-        this.elt(
-            clazz + (radiusClass ? " ace_br" + radiusClass : ""),
-            "height:"+ height+ "px;"+
-            "right:0;"+
-            "top:"+ top+ "px;"+
-            "left:"+ padding+ "px;"+ (extraStyle || "")
+        stringBuilder.push(
+            "<div class='", clazz, (radiusClass ? " ace_br" + radiusClass : ""), "' style='",
+            "height:", height, "px;",
+            "right:0;",
+            "top:", top, "px;",
+            "left:", padding, "px;", extraStyle, "'></div>"
         );
     };
     this.drawSingleLineMarker = function(stringBuilder, range, clazz, config, extraLength, extraStyle) {
-        if (this.session.$bidiHandler.isBidiRow(range.start.row))
-            return this.drawBidiSingleLineMarker(stringBuilder, range, clazz, config, extraLength, extraStyle);
         var height = config.lineHeight;
         var width = (range.end.column + (extraLength || 0) - range.start.column) * config.characterWidth;
 
         var top = this.$getTop(range.start.row, config);
         var left = this.$padding + range.start.column * config.characterWidth;
 
-        this.elt(
-            clazz,
-            "height:"+ height+ "px;"+
-            "width:"+ width+ "px;"+
-            "top:"+ top+ "px;"+
-            "left:"+ left+ "px;"+ (extraStyle || "")
+        stringBuilder.push(
+            "<div class='", clazz, "' style='",
+            "height:", height, "px;",
+            "width:", width, "px;",
+            "top:", top, "px;",
+            "left:", left, "px;", extraStyle || "", "'></div>"
         );
     };
     this.drawBidiSingleLineMarker = function(stringBuilder, range, clazz, config, extraLength, extraStyle) {
@@ -16241,14 +15578,14 @@ var Marker = function(parentEl) {
         var selections = this.session.$bidiHandler.getSelections(range.start.column, range.end.column);
 
         selections.forEach(function(selection) {
-            this.elt(
-                clazz,
-                "height:" + height + "px;" +
-                "width:" + selection.width + (extraLength || 0) + "px;" +
-                "top:" + top + "px;" +
-                "left:" + (padding + selection.left) + "px;" + (extraStyle || "")
+            stringBuilder.push(
+                "<div class='", clazz, "' style='",
+                "height:", height, "px;",
+                "width:", selection.width + (extraLength || 0), "px;",
+                "top:", top, "px;",
+                "left:", padding + selection.left, "px;", extraStyle || "", "'></div>"
             );
-        }, this);
+        });
     };
 
     this.drawFullLineMarker = function(stringBuilder, range, clazz, config, extraStyle) {
@@ -16257,11 +15594,11 @@ var Marker = function(parentEl) {
         if (range.start.row != range.end.row)
             height += this.$getTop(range.end.row, config) - top;
 
-        this.elt(
-            clazz,
-            "height:"+ height+ "px;"+
-            "top:"+ top+ "px;"+
-            "left:0;right:0;"+ (extraStyle || "")
+        stringBuilder.push(
+            "<div class='", clazz, "' style='",
+            "height:", height, "px;",
+            "top:", top, "px;",
+            "left:0;right:0;", extraStyle || "", "'></div>"
         );
     };
     
@@ -16269,11 +15606,11 @@ var Marker = function(parentEl) {
         var top = this.$getTop(range.start.row, config);
         var height = config.lineHeight;
 
-        this.elt(
-            clazz,
-            "height:"+ height+ "px;"+
-            "top:"+ top+ "px;"+
-            "left:0;right:0;"+ (extraStyle || "")
+        stringBuilder.push(
+            "<div class='", clazz, "' style='",
+            "height:", height, "px;",
+            "top:", top, "px;",
+            "left:0;right:0;", extraStyle || "", "'></div>"
         );
     };
 
@@ -16283,22 +15620,20 @@ exports.Marker = Marker;
 
 });
 
-ace.define("ace/layer/text",["require","exports","module","ace/lib/oop","ace/lib/dom","ace/lib/lang","ace/layer/lines","ace/lib/event_emitter"], function(require, exports, module) {
+ace.define("ace/layer/text",[], function(require, exports, module) {
 "use strict";
 
 var oop = require("../lib/oop");
 var dom = require("../lib/dom");
 var lang = require("../lib/lang");
-var Lines = require("./lines").Lines;
+var useragent = require("../lib/useragent");
 var EventEmitter = require("../lib/event_emitter").EventEmitter;
 
 var Text = function(parentEl) {
-    this.dom = dom; 
-    this.element = this.dom.createElement("div");
+    this.element = dom.createElement("div");
     this.element.className = "ace_layer ace_text-layer";
     parentEl.appendChild(this.element);
     this.$updateEolChar = this.$updateEolChar.bind(this);
-    this.$lines = new Lines(this.element);
 };
 
 (function() {
@@ -16315,9 +15650,9 @@ var Text = function(parentEl) {
     this.MAX_LINE_LENGTH = 10000;
 
     this.$updateEolChar = function() {
-        var doc = this.session.doc;
-        var unixMode = doc.getNewLineCharacter() == "\n" && doc.getNewLineMode() != "windows";
-        var EOL_CHAR = unixMode ? this.EOL_CHAR_LF : this.EOL_CHAR_CRLF;
+        var EOL_CHAR = this.session.doc.getNewLineCharacter() == "\n"
+           ? this.EOL_CHAR_LF
+           : this.EOL_CHAR_CRLF;
         if (this.EOL_CHAR != EOL_CHAR) {
             this.EOL_CHAR = EOL_CHAR;
             return true;
@@ -16326,7 +15661,7 @@ var Text = function(parentEl) {
 
     this.setPadding = function(padding) {
         this.$padding = padding;
-        this.element.style.margin = "0 " + padding + "px";
+        this.element.style.padding = "0 " + padding + "px";
     };
 
     this.getLineHeight = function() {
@@ -16385,12 +15720,11 @@ var Text = function(parentEl) {
         var tabStr = this.$tabStrings = [0];
         for (var i = 1; i < tabSize + 1; i++) {
             if (this.showInvisibles) {
-                var span = this.dom.createElement("span");
-                span.className = "ace_invisible ace_invisible_tab";
-                span.textContent = lang.stringRepeat(this.TAB_CHAR, i);
-                tabStr.push(span);
+                tabStr.push("<span class='ace_invisible ace_invisible_tab'>"
+                    + lang.stringRepeat(this.TAB_CHAR, i)
+                    + "</span>");
             } else {
-                tabStr.push(this.dom.createTextNode(lang.stringRepeat(" ", i), this.element));
+                tabStr.push(lang.stringRepeat(" ", i));
             }
         }
         if (this.displayIndentGuides) {
@@ -16404,29 +15738,21 @@ var Text = function(parentEl) {
                 tabClass = " ace_invisible_tab";
                 var spaceContent = lang.stringRepeat(this.SPACE_CHAR, this.tabSize);
                 var tabContent = lang.stringRepeat(this.TAB_CHAR, this.tabSize);
-            } else {
+            } else{
                 var spaceContent = lang.stringRepeat(" ", this.tabSize);
                 var tabContent = spaceContent;
             }
 
-            var span = this.dom.createElement("span");
-            span.className = className + spaceClass;
-            span.textContent = spaceContent;
-            this.$tabStrings[" "] = span;
-            
-            var span = this.dom.createElement("span");
-            span.className = className + tabClass;
-            span.textContent = tabContent;
-            this.$tabStrings["\t"] = span;
+            this.$tabStrings[" "] = "<span class='" + className + spaceClass + "'>" + spaceContent + "</span>";
+            this.$tabStrings["\t"] = "<span class='" + className + tabClass + "'>" + tabContent + "</span>";
         }
     };
 
     this.updateLines = function(config, firstRow, lastRow) {
         if (this.config.lastRow != config.lastRow ||
             this.config.firstRow != config.firstRow) {
-            return this.update(config);
+            this.scrollLines(config);
         }
-        
         this.config = config;
 
         var first = Math.max(firstRow, config.firstRow);
@@ -16448,7 +15774,6 @@ var Text = function(parentEl) {
             lineElementsIdx ++;
         }
 
-        var heightChanged = false;
         var row = first;
         var foldLine = this.session.getNextFoldLine(row);
         var foldStart = foldLine ? foldLine.start.row : Infinity;
@@ -16464,23 +15789,14 @@ var Text = function(parentEl) {
 
             var lineElement = lineElements[lineElementsIdx++];
             if (lineElement) {
-                this.dom.removeChildren(lineElement);
+                var html = [];
                 this.$renderLine(
-                    lineElement, row, row == foldStart ? foldLine : false
+                    html, row, !this.$useLineGroups(), row == foldStart ? foldLine : false
                 );
-                var height = (config.lineHeight * this.session.getRowLength(row)) + "px";
-                if (lineElement.style.height != height) {
-                    heightChanged = true;
-                    lineElement.style.height = height;
-                }
+                lineElement.style.height = config.lineHeight * this.session.getRowLength(row) + "px";
+                lineElement.innerHTML = html.join("");
             }
             row++;
-        }
-        if (heightChanged) {
-            while (lineElementsIdx < this.$lines.cells.length) {
-                var cell = this.$lines.cells[lineElementsIdx++];
-                cell.element.style.top = this.$lines.computeLineTop(cell.row, config, this.session) + "px";
-            }
         }
     };
 
@@ -16488,45 +15804,37 @@ var Text = function(parentEl) {
         var oldConfig = this.config;
         this.config = config;
 
-        if (this.$lines.pageChanged(oldConfig, config))
-            return this.update(config);
-            
-        this.$lines.moveContainer(config);
-        
-        var lastRow = config.lastRow;
-        var oldLastRow = oldConfig ? oldConfig.lastRow : -1;
-
-        if (!oldConfig || oldLastRow < config.firstRow)
-            return this.update(config);
-
-        if (lastRow < oldConfig.firstRow)
-            return this.update(config);
-
         if (!oldConfig || oldConfig.lastRow < config.firstRow)
             return this.update(config);
 
         if (config.lastRow < oldConfig.firstRow)
             return this.update(config);
 
+        var el = this.element;
         if (oldConfig.firstRow < config.firstRow)
             for (var row=this.session.getFoldedRowCount(oldConfig.firstRow, config.firstRow - 1); row>0; row--)
-                this.$lines.shift();
+                el.removeChild(el.firstChild);
 
         if (oldConfig.lastRow > config.lastRow)
             for (var row=this.session.getFoldedRowCount(config.lastRow + 1, oldConfig.lastRow); row>0; row--)
-                this.$lines.pop();
+                el.removeChild(el.lastChild);
 
         if (config.firstRow < oldConfig.firstRow) {
-            this.$lines.unshift(this.$renderLinesFragment(config, config.firstRow, oldConfig.firstRow - 1));
+            var fragment = this.$renderLinesFragment(config, config.firstRow, oldConfig.firstRow - 1);
+            if (el.firstChild)
+                el.insertBefore(fragment, el.firstChild);
+            else
+                el.appendChild(fragment);
         }
 
         if (config.lastRow > oldConfig.lastRow) {
-            this.$lines.push(this.$renderLinesFragment(config, oldConfig.lastRow + 1, config.lastRow));
+            var fragment = this.$renderLinesFragment(config, oldConfig.lastRow + 1, config.lastRow);
+            el.appendChild(fragment);
         }
     };
 
     this.$renderLinesFragment = function(config, firstRow, lastRow) {
-        var fragment = [];
+        var fragment = this.element.ownerDocument.createDocumentFragment();
         var row = firstRow;
         var foldLine = this.session.getNextFoldLine(row);
         var foldStart = foldLine ? foldLine.start.row : Infinity;
@@ -16540,20 +15848,21 @@ var Text = function(parentEl) {
             if (row > lastRow)
                 break;
 
-            var line = this.$lines.createCell(row, config, this.session);
-            
-            var lineEl = line.element;
-            this.dom.removeChildren(lineEl);
-            dom.setStyle(lineEl.style, "height", this.$lines.computeLineHeight(row, config, this.session) + "px");
-            dom.setStyle(lineEl.style, "top", this.$lines.computeLineTop(row, config, this.session) + "px");
-            this.$renderLine(lineEl, row, row == foldStart ? foldLine : false);
+            var container = dom.createElement("div");
 
+            var html = [];
+            this.$renderLine(html, row, false, row == foldStart ? foldLine : false);
+
+            container.innerHTML = html.join("");
             if (this.$useLineGroups()) {
-                lineEl.className = "ace_line_group";
+                container.className = 'ace_line_group';
+                fragment.appendChild(container);
+                container.style.height = config.lineHeight * this.session.getRowLength(row) + "px";
+
             } else {
-                lineEl.className = "ace_line";
+                while(container.firstChild)
+                    fragment.appendChild(container.firstChild);
             }
-            fragment.push(line);
 
             row++;
         }
@@ -16561,18 +15870,35 @@ var Text = function(parentEl) {
     };
 
     this.update = function(config) {
-        this.$lines.moveContainer(config);
-        
         this.config = config;
 
-        var firstRow = config.firstRow;
-        var lastRow = config.lastRow;
+        var html = [];
+        var firstRow = config.firstRow, lastRow = config.lastRow;
 
-        var lines = this.$lines;
-        while (lines.getLength())
-            lines.pop();
-            
-        lines.push(this.$renderLinesFragment(config, firstRow, lastRow));
+        var row = firstRow;
+        var foldLine = this.session.getNextFoldLine(row);
+        var foldStart = foldLine ? foldLine.start.row : Infinity;
+
+        while (true) {
+            if (row > foldStart) {
+                row = foldLine.end.row+1;
+                foldLine = this.session.getNextFoldLine(row, foldLine);
+                foldStart = foldLine ? foldLine.start.row :Infinity;
+            }
+            if (row > lastRow)
+                break;
+
+            if (this.$useLineGroups())
+                html.push("<div class='ace_line_group' style='height:", config.lineHeight*this.session.getRowLength(row), "px'>");
+
+            this.$renderLine(html, row, false, row == foldStart ? foldLine : false);
+
+            if (this.$useLineGroups())
+                html.push("</div>"); // end the line group
+
+            row++;
+        }
+        this.element.innerHTML = html.join("");
     };
 
     this.$textToken = {
@@ -16581,153 +15907,108 @@ var Text = function(parentEl) {
         "lparen": true
     };
 
-    this.$renderToken = function(parent, screenColumn, token, value) {
+    this.$renderToken = function(stringBuilder, screenColumn, token, value) {
         var self = this;
-        var re = /(\t)|( +)|([\x00-\x1f\x80-\xa0\xad\u1680\u180E\u2000-\u200f\u2028\u2029\u202F\u205F\uFEFF\uFFF9-\uFFFC]+)|(\u3000)|([\u1100-\u115F\u11A3-\u11A7\u11FA-\u11FF\u2329-\u232A\u2E80-\u2E99\u2E9B-\u2EF3\u2F00-\u2FD5\u2FF0-\u2FFB\u3001-\u303E\u3041-\u3096\u3099-\u30FF\u3105-\u312D\u3131-\u318E\u3190-\u31BA\u31C0-\u31E3\u31F0-\u321E\u3220-\u3247\u3250-\u32FE\u3300-\u4DBF\u4E00-\uA48C\uA490-\uA4C6\uA960-\uA97C\uAC00-\uD7A3\uD7B0-\uD7C6\uD7CB-\uD7FB\uF900-\uFAFF\uFE10-\uFE19\uFE30-\uFE52\uFE54-\uFE66\uFE68-\uFE6B\uFF01-\uFF60\uFFE0-\uFFE6]|[\uD800-\uDBFF][\uDC00-\uDFFF])/g;
-        
-        var valueFragment = this.dom.createFragment(this.element);
-
-        var m;
-        var i = 0;
-        while (m = re.exec(value)) {
-            var tab = m[1];
-            var simpleSpace = m[2];
-            var controlCharacter = m[3];
-            var cjkSpace = m[4];
-            var cjk = m[5];
-            
-            if (!self.showInvisibles && simpleSpace)
-                continue;
-
-            var before = i != m.index ? value.slice(i, m.index) : "";
-
-            i = m.index + m[0].length;
-            
-            if (before) {
-                valueFragment.appendChild(this.dom.createTextNode(before, this.element));
-            }
-                
-            if (tab) {
-                var tabSize = self.session.getScreenTabSize(screenColumn + m.index);
-                valueFragment.appendChild(self.$tabStrings[tabSize].cloneNode(true));
+        var replaceReg = /\t|&|<|>|( +)|([\x00-\x1f\x80-\xa0\xad\u1680\u180E\u2000-\u200f\u2028\u2029\u202F\u205F\u3000\uFEFF\uFFF9-\uFFFC])|[\u1100-\u115F\u11A3-\u11A7\u11FA-\u11FF\u2329-\u232A\u2E80-\u2E99\u2E9B-\u2EF3\u2F00-\u2FD5\u2FF0-\u2FFB\u3000-\u303E\u3041-\u3096\u3099-\u30FF\u3105-\u312D\u3131-\u318E\u3190-\u31BA\u31C0-\u31E3\u31F0-\u321E\u3220-\u3247\u3250-\u32FE\u3300-\u4DBF\u4E00-\uA48C\uA490-\uA4C6\uA960-\uA97C\uAC00-\uD7A3\uD7B0-\uD7C6\uD7CB-\uD7FB\uF900-\uFAFF\uFE10-\uFE19\uFE30-\uFE52\uFE54-\uFE66\uFE68-\uFE6B\uFF01-\uFF60\uFFE0-\uFFE6]|[\uD800-\uDBFF][\uDC00-\uDFFF]/g;
+        var replaceFunc = function(c, a, b, tabIdx, idx4) {
+            if (a) {
+                return self.showInvisibles
+                    ? "<span class='ace_invisible ace_invisible_space'>" + lang.stringRepeat(self.SPACE_CHAR, c.length) + "</span>"
+                    : c;
+            } else if (c == "&") {
+                return "&#38;";
+            } else if (c == "<") {
+                return "&#60;";
+            } else if (c == ">") {
+                return "&#62;";
+            } else if (c == "\t") {
+                var tabSize = self.session.getScreenTabSize(screenColumn + tabIdx);
                 screenColumn += tabSize - 1;
-            } else if (simpleSpace) {
-                if (self.showInvisibles) {
-                    var span = this.dom.createElement("span");
-                    span.className = "ace_invisible ace_invisible_space";
-                    span.textContent = lang.stringRepeat(self.SPACE_CHAR, simpleSpace.length);
-                    valueFragment.appendChild(span);
-                } else {
-                    valueFragment.appendChild(this.com.createTextNode(simpleSpace, this.element));
-                }
-            } else if (controlCharacter) {
-                var span = this.dom.createElement("span");
-                span.className = "ace_invisible ace_invisible_space ace_invalid";
-                span.textContent = lang.stringRepeat(self.SPACE_CHAR, controlCharacter.length);
-                valueFragment.appendChild(span);
-            } else if (cjkSpace) {
+                return self.$tabStrings[tabSize];
+            } else if (c == "\u3000") {
+                var classToUse = self.showInvisibles ? "ace_cjk ace_invisible ace_invisible_space" : "ace_cjk";
                 var space = self.showInvisibles ? self.SPACE_CHAR : "";
                 screenColumn += 1;
-                
-                var span = this.dom.createElement("span");
-                span.style.width = (self.config.characterWidth * 2) + "px";
-                span.className = self.showInvisibles ? "ace_cjk ace_invisible ace_invisible_space" : "ace_cjk";
-                span.textContent = self.showInvisibles ? self.SPACE_CHAR : "";
-                valueFragment.appendChild(span);
-            } else if (cjk) {
+                return "<span class='" + classToUse + "' style='width:" +
+                    (self.config.characterWidth * 2) +
+                    "px'>" + space + "</span>";
+            } else if (b) {
+                return "<span class='ace_invisible ace_invisible_space ace_invalid'>" + self.SPACE_CHAR + "</span>";
+            } else {
                 screenColumn += 1;
-                var span = dom.createElement("span");
-                span.style.width = (self.config.characterWidth * 2) + "px";
-                span.className = "ace_cjk";
-                span.textContent = cjk;
-                valueFragment.appendChild(span);
+                return "<span class='ace_cjk' style='width:" +
+                    (self.config.characterWidth * 2) +
+                    "px'>" + c + "</span>";
             }
-        }
-        
-        valueFragment.appendChild(this.dom.createTextNode(i ? value.slice(i) : value, this.element));
+        };
+
+        var output = value.replace(replaceReg, replaceFunc);
 
         if (!this.$textToken[token.type]) {
             var classes = "ace_" + token.type.replace(/\./g, " ace_");
-            var span = this.dom.createElement("span");
+            var style = "";
             if (token.type == "fold")
-                span.style.width = (token.value.length * this.config.characterWidth) + "px";
-                
-            span.className = classes;
-            span.appendChild(valueFragment);
-            
-            parent.appendChild(span);
+                style = " style='width:" + (token.value.length * this.config.characterWidth) + "px;' ";
+            stringBuilder.push("<span class='", classes, "'", style, ">", output, "</span>");
         }
         else {
-            parent.appendChild(valueFragment);
+            stringBuilder.push(output);
         }
-        
         return screenColumn + value.length;
     };
 
-    this.renderIndentGuide = function(parent, value, max) {
+    this.renderIndentGuide = function(stringBuilder, value, max) {
         var cols = value.search(this.$indentGuideRe);
         if (cols <= 0 || cols >= max)
             return value;
         if (value[0] == " ") {
             cols -= cols % this.tabSize;
-            var count = cols/this.tabSize;
-            for (var i=0; i<count; i++) {
-                parent.appendChild(this.$tabStrings[" "].cloneNode(true));
-            }
+            stringBuilder.push(lang.stringRepeat(this.$tabStrings[" "], cols/this.tabSize));
             return value.substr(cols);
         } else if (value[0] == "\t") {
-            for (var i=0; i<cols; i++) {
-                parent.appendChild(this.$tabStrings["\t"].cloneNode(true));
-            }
+            stringBuilder.push(lang.stringRepeat(this.$tabStrings["\t"], cols));
             return value.substr(cols);
         }
         return value;
     };
 
-    this.$createLineElement = function(parent) {
-        var lineEl = this.dom.createElement("div");
-        lineEl.className = "ace_line";
-        lineEl.style.height = this.config.lineHeight + "px";
-        
-        return lineEl;
-    };
-
-    this.$renderWrappedLine = function(parent, tokens, splits) {
+    this.$renderWrappedLine = function(stringBuilder, tokens, splits, onlyContents) {
         var chars = 0;
         var split = 0;
         var splitChars = splits[0];
         var screenColumn = 0;
 
-        var lineEl = this.$createLineElement();
-        parent.appendChild(lineEl);
-        
         for (var i = 0; i < tokens.length; i++) {
             var token = tokens[i];
             var value = token.value;
             if (i == 0 && this.displayIndentGuides) {
                 chars = value.length;
-                value = this.renderIndentGuide(lineEl, value, splitChars);
+                value = this.renderIndentGuide(stringBuilder, value, splitChars);
                 if (!value)
                     continue;
                 chars -= value.length;
             }
 
             if (chars + value.length < splitChars) {
-                screenColumn = this.$renderToken(lineEl, screenColumn, token, value);
+                screenColumn = this.$renderToken(stringBuilder, screenColumn, token, value);
                 chars += value.length;
             } else {
                 while (chars + value.length >= splitChars) {
                     screenColumn = this.$renderToken(
-                        lineEl, screenColumn,
+                        stringBuilder, screenColumn,
                         token, value.substring(0, splitChars - chars)
                     );
                     value = value.substring(splitChars - chars);
                     chars = splitChars;
 
-                    lineEl = this.$createLineElement();
-                    parent.appendChild(lineEl);
+                    if (!onlyContents) {
+                        stringBuilder.push("</div>",
+                            "<div class='ace_line' style='height:",
+                            this.config.lineHeight, "px'>"
+                        );
+                    }
 
-                    lineEl.appendChild(this.dom.createTextNode(lang.stringRepeat("\xa0", splits.indent), this.element));
+                    stringBuilder.push(lang.stringRepeat("\xa0", splits.indent));
 
                     split ++;
                     screenColumn = 0;
@@ -16736,43 +16017,38 @@ var Text = function(parentEl) {
                 if (value.length != 0) {
                     chars += value.length;
                     screenColumn = this.$renderToken(
-                        lineEl, screenColumn, token, value
+                        stringBuilder, screenColumn, token, value
                     );
                 }
             }
         }
     };
 
-    this.$renderSimpleLine = function(parent, tokens) {
+    this.$renderSimpleLine = function(stringBuilder, tokens) {
         var screenColumn = 0;
         var token = tokens[0];
         var value = token.value;
         if (this.displayIndentGuides)
-            value = this.renderIndentGuide(parent, value);
+            value = this.renderIndentGuide(stringBuilder, value);
         if (value)
-            screenColumn = this.$renderToken(parent, screenColumn, token, value);
+            screenColumn = this.$renderToken(stringBuilder, screenColumn, token, value);
         for (var i = 1; i < tokens.length; i++) {
             token = tokens[i];
             value = token.value;
             if (screenColumn + value.length > this.MAX_LINE_LENGTH)
-                return this.$renderOverflowMessage(parent, screenColumn, token, value);
-            screenColumn = this.$renderToken(parent, screenColumn, token, value);
+                return this.$renderOverflowMessage(stringBuilder, screenColumn, token, value);
+            screenColumn = this.$renderToken(stringBuilder, screenColumn, token, value);
         }
     };
     
-    this.$renderOverflowMessage = function(parent, screenColumn, token, value) {
-        this.$renderToken(parent, screenColumn, token,
+    this.$renderOverflowMessage = function(stringBuilder, screenColumn, token, value) {
+        this.$renderToken(stringBuilder, screenColumn, token,
             value.slice(0, this.MAX_LINE_LENGTH - screenColumn));
-            
-        var overflowEl = this.dom.createElement("span");
-        overflowEl.className = "ace_inline_button ace_keyword ace_toggle_wrap";
-        overflowEl.style.position = "absolute";
-        overflowEl.style.right = "0";
-        overflowEl.textContent = "<click to see more...>";
-        
-        parent.appendChild(overflowEl);        
+        stringBuilder.push(
+            "<span style='position:absolute;right:0' class='ace_inline_button ace_keyword ace_toggle_wrap'>&lt;click to see more...&gt;</span>"
+        );
     };
-    this.$renderLine = function(parent, row, foldLine) {
+    this.$renderLine = function(stringBuilder, row, onlyContents, foldLine) {
         if (!foldLine && foldLine != false)
             foldLine = this.session.getFoldLine(row);
 
@@ -16781,35 +16057,36 @@ var Text = function(parentEl) {
         else
             var tokens = this.session.getTokens(row);
 
-        var lastLineEl = parent;
-        if (tokens.length) {
-            var splits = this.session.getRowSplitData(row);
-            if (splits && splits.length) {
-                this.$renderWrappedLine(parent, tokens, splits);
-                var lastLineEl = parent.lastChild;
-            } else {
-                var lastLineEl = parent;
-                if (this.$useLineGroups()) {
-                    lastLineEl = this.$createLineElement();
-                    parent.appendChild(lastLineEl);
-                }
-                this.$renderSimpleLine(lastLineEl, tokens);
-            }
-        } else if (this.$useLineGroups()) {
-            lastLineEl = this.$createLineElement();
-            parent.appendChild(lastLineEl);
+
+        if (!onlyContents) {
+            stringBuilder.push(
+                "<div class='ace_line' style='height:", 
+                    this.config.lineHeight * (
+                        this.$useLineGroups() ? 1 :this.session.getRowLength(row)
+                    ), "px'>"
+            );
         }
 
-        if (this.showInvisibles && lastLineEl) {
+        if (tokens.length) {
+            var splits = this.session.getRowSplitData(row);
+            if (splits && splits.length)
+                this.$renderWrappedLine(stringBuilder, tokens, splits, onlyContents);
+            else
+                this.$renderSimpleLine(stringBuilder, tokens);
+        }
+
+        if (this.showInvisibles) {
             if (foldLine)
                 row = foldLine.end.row;
 
-            var invisibleEl = this.dom.createElement("span");
-            invisibleEl.className = "ace_invisible ace_invisible_eol";
-            invisibleEl.textContent = row == this.session.getLength() - 1 ? this.EOF_CHAR : this.EOL_CHAR;
-            
-            lastLineEl.appendChild(invisibleEl);
+            stringBuilder.push(
+                "<span class='ace_invisible ace_invisible_eol'>",
+                row == this.session.getLength() - 1 ? this.EOF_CHAR : this.EOL_CHAR,
+                "</span>"
+            );
         }
+        if (!onlyContents)
+            stringBuilder.push("</div>");
     };
 
     this.$getFoldLineTokens = function(row, foldLine) {
@@ -16876,23 +16153,33 @@ var Text = function(parentEl) {
         return this.session.getUseWrapMode();
     };
 
-    this.destroy = function() {};
+    this.destroy = function() {
+        clearInterval(this.$pollSizeChangesTimer);
+        if (this.$measureNode)
+            this.$measureNode.parentNode.removeChild(this.$measureNode);
+        delete this.$measureNode;
+    };
+
 }).call(Text.prototype);
 
 exports.Text = Text;
 
 });
 
-ace.define("ace/layer/cursor",["require","exports","module","ace/lib/dom"], function(require, exports, module) {
+ace.define("ace/layer/cursor",[], function(require, exports, module) {
 "use strict";
 
 var dom = require("../lib/dom");
+var isIE8;
 
 var Cursor = function(parentEl) {
     this.element = dom.createElement("div");
     this.element.className = "ace_layer ace_cursor-layer";
     parentEl.appendChild(this.element);
     
+    if (isIE8 === undefined)
+        isIE8 = !("opacity" in this.element.style);
+
     this.isVisible = false;
     this.isBlinking = true;
     this.blinkInterval = 1000;
@@ -16901,17 +16188,24 @@ var Cursor = function(parentEl) {
     this.cursors = [];
     this.cursor = this.addCursor();
     dom.addCssClass(this.element, "ace_hidden-cursors");
-    this.$updateCursors = this.$updateOpacity.bind(this);
+    this.$updateCursors = (isIE8
+        ? this.$updateVisibility
+        : this.$updateOpacity).bind(this);
 };
 
 (function() {
     
+    this.$updateVisibility = function(val) {
+        var cursors = this.cursors;
+        for (var i = cursors.length; i--; )
+            cursors[i].style.visibility = val ? "" : "hidden";
+    };
     this.$updateOpacity = function(val) {
         var cursors = this.cursors;
         for (var i = cursors.length; i--; )
-            dom.setStyle(cursors[i].style, "opacity", val ? "" : "0");
+            cursors[i].style.opacity = val ? "" : "0";
     };
-
+    
     this.$startCssAnimation = function() {
         var cursors = this.cursors;
         for (var i = cursors.length; i--; )
@@ -16936,24 +16230,25 @@ var Cursor = function(parentEl) {
     };
 
     this.setBlinking = function(blinking) {
-        if (blinking != this.isBlinking) {
+        if (blinking != this.isBlinking){
             this.isBlinking = blinking;
             this.restartTimer();
         }
     };
 
     this.setBlinkInterval = function(blinkInterval) {
-        if (blinkInterval != this.blinkInterval) {
+        if (blinkInterval != this.blinkInterval){
             this.blinkInterval = blinkInterval;
             this.restartTimer();
         }
     };
 
     this.setSmoothBlinking = function(smoothBlinking) {
-        if (smoothBlinking != this.smoothBlinking) {
+        if (smoothBlinking != this.smoothBlinking && !isIE8) {
             this.smoothBlinking = smoothBlinking;
             dom.setCssClass(this.element, "ace_smooth-blinking", smoothBlinking);
             this.$updateCursors(true);
+            this.$updateCursors = (this.$updateOpacity).bind(this);
             this.restartTimer();
         }
     };
@@ -16991,17 +16286,15 @@ var Cursor = function(parentEl) {
         clearInterval(this.intervalId);
         clearTimeout(this.timeoutId);
         this.$stopCssAnimation();
-
+        
         if (this.smoothBlinking) {
             dom.removeCssClass(this.element, "ace_smooth-blinking");
         }
         
         update(true);
 
-        if (!this.isBlinking || !this.blinkInterval || !this.isVisible) {
-            this.$stopCssAnimation();
+        if (!this.isBlinking || !this.blinkInterval || !this.isVisible)
             return;
-        }
 
         if (this.smoothBlinking) {
             setTimeout(function(){
@@ -17043,10 +16336,6 @@ var Cursor = function(parentEl) {
         return {left : cursorLeft, top : cursorTop};
     };
 
-    this.isCursorInView = function(pixelPos, config) {
-        return pixelPos.top >= 0 && pixelPos.top < config.maxHeight;
-    };
-
     this.update = function(config) {
         this.config = config;
 
@@ -17064,20 +16353,15 @@ var Cursor = function(parentEl) {
                 continue;
             }
 
-            var element = this.cursors[cursorIndex++] || this.addCursor();
-            var style = element.style;
+            var style = (this.cursors[cursorIndex++] || this.addCursor()).style;
             
             if (!this.drawCursor) {
-                if (!this.isCursorInView(pixelPos, config)) {
-                    dom.setStyle(style, "display", "none");
-                } else {
-                    dom.setStyle(style, "display", "block");
-                    dom.translate(element, pixelPos.left, pixelPos.top);
-                    dom.setStyle(style, "width", Math.round(config.characterWidth) + "px");
-                    dom.setStyle(style, "height", config.lineHeight + "px");
-                }
+                style.left = pixelPos.left + "px";
+                style.top = pixelPos.top + "px";
+                style.width = config.characterWidth + "px";
+                style.height = config.lineHeight + "px";
             } else {
-                this.drawCursor(element, pixelPos, config, selections[i], this.session);
+                this.drawCursor(style, pixelPos, config, selections[i], this.session);
             }
         }
         while (this.cursors.length > cursorIndex)
@@ -17112,7 +16396,7 @@ exports.Cursor = Cursor;
 
 });
 
-ace.define("ace/scrollbar",["require","exports","module","ace/lib/oop","ace/lib/dom","ace/lib/event","ace/lib/event_emitter"], function(require, exports, module) {
+ace.define("ace/scrollbar",[], function(require, exports, module) {
 "use strict";
 
 var oop = require("./lib/oop");
@@ -17132,7 +16416,7 @@ var ScrollBar = function(parent) {
 
     this.setVisible(false);
     this.skipEvent = false;
-    
+
     event.addListener(this.element, "scroll", this.onScroll.bind(this));
     event.addListener(this.element, "mousedown", event.preventDefault);
 };
@@ -17249,7 +16533,7 @@ exports.VScrollBar = VScrollBar;
 exports.HScrollBar = HScrollBar;
 });
 
-ace.define("ace/renderloop",["require","exports","module","ace/lib/event"], function(require, exports, module) {
+ace.define("ace/renderloop",[], function(require, exports, module) {
 "use strict";
 
 var event = require("./lib/event");
@@ -17260,27 +16544,28 @@ var RenderLoop = function(onRender, win) {
     this.pending = false;
     this.changes = 0;
     this.window = win || window;
-    var _self = this;
-    this._flush = function(ts) {
-        var changes = _self.changes;
-
-        if (changes) {
-            event.blockIdle(100);
-            _self.changes = 0;
-            _self.onRender(changes);
-        }
-        
-        if (_self.changes)
-            _self.schedule();
-    };
 };
 
 (function() {
 
+
     this.schedule = function(change) {
         this.changes = this.changes | change;
         if (this.changes) {
-            event.nextFrame(this._flush);
+            var _self = this;
+            
+            event.nextFrame(function(ts) {
+                var changes = _self.changes;
+
+                if (changes) {
+                    event.blockIdle(100);
+                    _self.changes = 0;
+                    _self.onRender(changes);
+                }
+                
+                if (_self.changes)
+                    _self.schedule();
+            });
         }
     };
 
@@ -17289,7 +16574,7 @@ var RenderLoop = function(onRender, win) {
 exports.RenderLoop = RenderLoop;
 });
 
-ace.define("ace/layer/font_metrics",["require","exports","module","ace/lib/oop","ace/lib/dom","ace/lib/lang","ace/lib/event","ace/lib/useragent","ace/lib/event_emitter"], function(require, exports, module) {
+ace.define("ace/layer/font_metrics",[], function(require, exports, module) {
 
 var oop = require("../lib/oop");
 var dom = require("../lib/dom");
@@ -17421,8 +16706,6 @@ var FontMetrics = exports.FontMetrics = function(parentEl) {
 
     this.destroy = function() {
         clearInterval(this.$pollSizeChangesTimer);
-        if (this.$observer)
-            this.$observer.disconnect();
         if (this.el && this.el.parentNode)
             this.el.parentNode.removeChild(this.el);
     };
@@ -17489,12 +16772,13 @@ var FontMetrics = exports.FontMetrics = function(parentEl) {
 
 });
 
-ace.define("ace/virtual_renderer",["require","exports","module","ace/lib/oop","ace/lib/dom","ace/config","ace/layer/gutter","ace/layer/marker","ace/layer/text","ace/layer/cursor","ace/scrollbar","ace/scrollbar","ace/renderloop","ace/layer/font_metrics","ace/lib/event_emitter","ace/lib/useragent"], function(require, exports, module) {
+ace.define("ace/virtual_renderer",[], function(require, exports, module) {
 "use strict";
 
 var oop = require("./lib/oop");
 var dom = require("./lib/dom");
 var config = require("./config");
+var useragent = require("./lib/useragent");
 var GutterLayer = require("./layer/gutter").Gutter;
 var MarkerLayer = require("./layer/marker").Marker;
 var TextLayer = require("./layer/text").Text;
@@ -17504,22 +16788,7 @@ var VScrollBar = require("./scrollbar").VScrollBar;
 var RenderLoop = require("./renderloop").RenderLoop;
 var FontMetrics = require("./layer/font_metrics").FontMetrics;
 var EventEmitter = require("./lib/event_emitter").EventEmitter;
-var editorCss = ".ace_br1 {border-top-left-radius    : 3px;}\
-.ace_br2 {border-top-right-radius   : 3px;}\
-.ace_br3 {border-top-left-radius    : 3px; border-top-right-radius:    3px;}\
-.ace_br4 {border-bottom-right-radius: 3px;}\
-.ace_br5 {border-top-left-radius    : 3px; border-bottom-right-radius: 3px;}\
-.ace_br6 {border-top-right-radius   : 3px; border-bottom-right-radius: 3px;}\
-.ace_br7 {border-top-left-radius    : 3px; border-top-right-radius:    3px; border-bottom-right-radius: 3px;}\
-.ace_br8 {border-bottom-left-radius : 3px;}\
-.ace_br9 {border-top-left-radius    : 3px; border-bottom-left-radius:  3px;}\
-.ace_br10{border-top-right-radius   : 3px; border-bottom-left-radius:  3px;}\
-.ace_br11{border-top-left-radius    : 3px; border-top-right-radius:    3px; border-bottom-left-radius:  3px;}\
-.ace_br12{border-bottom-right-radius: 3px; border-bottom-left-radius:  3px;}\
-.ace_br13{border-top-left-radius    : 3px; border-bottom-right-radius: 3px; border-bottom-left-radius:  3px;}\
-.ace_br14{border-top-right-radius   : 3px; border-bottom-right-radius: 3px; border-bottom-left-radius:  3px;}\
-.ace_br15{border-top-left-radius    : 3px; border-top-right-radius:    3px; border-bottom-right-radius: 3px; border-bottom-left-radius: 3px;}\
-.ace_editor {\
+var editorCss = ".ace_editor {\
 position: relative;\
 overflow: hidden;\
 font: 12px/normal 'Monaco', 'Menlo', 'Ubuntu Mono', 'Consolas', 'source-code-pro', monospace;\
@@ -17543,7 +16812,6 @@ cursor: text;\
 position: absolute;\
 box-sizing: border-box;\
 min-width: 100%;\
-contain: style size layout;\
 }\
 .ace_dragging .ace_scroller:before{\
 position: absolute;\
@@ -17574,7 +16842,6 @@ z-index: 4;\
 -moz-user-select: none;\
 -webkit-user-select: none;\
 user-select: none;\
-contain: style size layout;\
 }\
 .ace_gutter-active-line {\
 position: absolute;\
@@ -17585,10 +16852,6 @@ right: 0;\
 box-shadow: 17px 0 16px -16px rgba(0, 0, 0, 0.4) inset;\
 }\
 .ace_gutter-cell {\
-position: absolute;\
-top: 0;\
-left: 0;\
-right: 0;\
 padding-left: 19px;\
 padding-right: 6px;\
 background-repeat: no-repeat;\
@@ -17610,7 +16873,6 @@ background-position: 2px center;\
 background-image: url(\"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQBAMAAADt3eJSAAAAJFBMVEUAAAChoaGAgIAqKiq+vr6tra1ZWVmUlJSbm5s8PDxubm56enrdgzg3AAAAAXRSTlMAQObYZgAAAClJREFUeNpjYMAPdsMYHegyJZFQBlsUlMFVCWUYKkAZMxZAGdxlDMQBAG+TBP4B6RyJAAAAAElFTkSuQmCC\");\
 }\
 .ace_scrollbar {\
-contain: strict;\
 position: absolute;\
 right: 0;\
 bottom: 0;\
@@ -17652,7 +16914,7 @@ overflow: hidden;\
 font: inherit;\
 padding: 0 1px;\
 margin: 0 -1px;\
-contain: strict;\
+text-indent: -1em;\
 -ms-user-select: text;\
 -moz-user-select: text;\
 -webkit-user-select: text;\
@@ -17660,17 +16922,11 @@ user-select: text;\
 white-space: pre!important;\
 }\
 .ace_text-input.ace_composition {\
-background: transparent;\
+background: inherit;\
 color: inherit;\
 z-index: 1000;\
 opacity: 1;\
-}\
-.ace_composition_placeholder { color: transparent }\
-.ace_composition_marker { \
-border-bottom: 1px solid;\
-position: absolute;\
-border-radius: 0;\
-margin-top: 1px;\
+text-indent: 0;\
 }\
 [ace_nocontext=true] {\
 transform: none!important;\
@@ -17699,33 +16955,9 @@ position: relative;\
 width: auto;\
 text-align: right;\
 pointer-events: auto;\
-height: 1000000px;\
-contain: style size layout;\
 }\
 .ace_text-layer {\
 font: inherit !important;\
-position: absolute;\
-height: 1000000px;\
-width: 1000000px;\
-contain: style size layout;\
-}\
-.ace_text-layer > .ace_line, .ace_text-layer > .ace_line_group {\
-contain: style size layout;\
-position: absolute;\
-top: 0;\
-left: 0;\
-right: 0;\
-}\
-.ace_hidpi .ace_text-layer,\
-.ace_hidpi .ace_gutter-layer,\
-.ace_hidpi .ace_content,\
-.ace_hidpi .ace_gutter {\
-contain: strict;\
-will-change: transform;\
-}\
-.ace_hidpi .ace_text-layer > .ace_line, \
-.ace_hidpi .ace_text-layer > .ace_line_group {\
-contain: strict;\
 }\
 .ace_cjk {\
 display: inline-block;\
@@ -17943,15 +17175,27 @@ background-color: rgba(255, 255, 0,0.2);\
 position: absolute;\
 z-index: 8;\
 }\
+.ace_br1 {border-top-left-radius    : 3px;}\
+.ace_br2 {border-top-right-radius   : 3px;}\
+.ace_br3 {border-top-left-radius    : 3px; border-top-right-radius:    3px;}\
+.ace_br4 {border-bottom-right-radius: 3px;}\
+.ace_br5 {border-top-left-radius    : 3px; border-bottom-right-radius: 3px;}\
+.ace_br6 {border-top-right-radius   : 3px; border-bottom-right-radius: 3px;}\
+.ace_br7 {border-top-left-radius    : 3px; border-top-right-radius:    3px; border-bottom-right-radius: 3px;}\
+.ace_br8 {border-bottom-left-radius : 3px;}\
+.ace_br9 {border-top-left-radius    : 3px; border-bottom-left-radius:  3px;}\
+.ace_br10{border-top-right-radius   : 3px; border-bottom-left-radius:  3px;}\
+.ace_br11{border-top-left-radius    : 3px; border-top-right-radius:    3px; border-bottom-left-radius:  3px;}\
+.ace_br12{border-bottom-right-radius: 3px; border-bottom-left-radius:  3px;}\
+.ace_br13{border-top-left-radius    : 3px; border-bottom-right-radius: 3px; border-bottom-left-radius:  3px;}\
+.ace_br14{border-top-right-radius   : 3px; border-bottom-right-radius: 3px; border-bottom-left-radius:  3px;}\
+.ace_br15{border-top-left-radius    : 3px; border-top-right-radius:    3px; border-bottom-right-radius: 3px; border-bottom-left-radius: 3px;}\
 .ace_text-input-ios {\
 position: absolute !important;\
 top: -100000px !important;\
 left: -100000px !important;\
 }\
 ";
-
-var useragent = require("./lib/useragent");
-var HIDE_TEXTAREA = useragent.isIE;
 
 dom.importCssString(editorCss, "ace_editor.css");
 
@@ -17961,7 +17205,6 @@ var VirtualRenderer = function(container, theme) {
     this.container = container || dom.createElement("div");
 
     dom.addCssClass(this.container, "ace_editor");
-    if (dom.HI_DPI) dom.addCssClass(this.container, "ace_hidpi");
 
     this.setTheme(theme);
 
@@ -17972,7 +17215,6 @@ var VirtualRenderer = function(container, theme) {
 
     this.scroller = dom.createElement("div");
     this.scroller.className = "ace_scroller";
-    
     this.container.appendChild(this.scroller);
 
     this.content = dom.createElement("div");
@@ -18052,17 +17294,6 @@ var VirtualRenderer = function(container, theme) {
         v: 0,
         h: 0
     };
-    
-    this.margin = {
-        left: 0,
-        right: 0,
-        top: 0,
-        bottom: 0,
-        v: 0,
-        h: 0
-    };
-    
-    this.$keepTextAreaAtCursor = true;
 
     this.$loop = new RenderLoop(
         this.$renderChanges.bind(this),
@@ -18247,18 +17478,15 @@ var VirtualRenderer = function(container, theme) {
             
             this.gutterWidth = gutterWidth;
             
-            dom.setStyle(this.scrollBarH.element.style, "left", gutterWidth + "px");
-            dom.setStyle(this.scroller.style, "left", gutterWidth + this.margin.left + "px");
-            size.scrollerWidth = Math.max(0, width - gutterWidth - this.scrollBarV.getWidth() - this.margin.h);
-            dom.setStyle(this.$gutter.style, "left", this.margin.left + "px");
+            this.scrollBarH.element.style.left = 
+            this.scroller.style.left = gutterWidth + "px";
+            size.scrollerWidth = Math.max(0, width - gutterWidth - this.scrollBarV.getWidth());           
             
-            var right = this.scrollBarV.getWidth() + "px";
-            dom.setStyle(this.scrollBarH.element.style, "right", right);
-            dom.setStyle(this.scroller.style, "right", right);
-            dom.setStyle(this.scroller.style, "bottom", this.scrollBarH.getHeight());
-            if (this.session && this.session.getUseWrapMode() && this.adjustWrapLimit() || force) {
+            this.scrollBarH.element.style.right = 
+            this.scroller.style.right = this.scrollBarV.getWidth() + "px";
+            this.scroller.style.bottom = this.scrollBarH.getHeight() + "px";
+            if (this.session && this.session.getUseWrapMode() && this.adjustWrapLimit() || force)
                 changes |= this.CHANGE_FULL;
-            }
         }
         
         size.$dirty = !width || !height;
@@ -18269,8 +17497,8 @@ var VirtualRenderer = function(container, theme) {
         return changes;
     };
 
-    this.onGutterResize = function(width) {
-        var gutterWidth = this.$showGutter ? width : 0;
+    this.onGutterResize = function() {
+        var gutterWidth = this.$showGutter ? this.$gutter.offsetWidth : 0;
         if (gutterWidth != this.gutterWidth)
             this.$changes |= this.$updateCachedSize(true, gutterWidth, this.$size.width, this.$size.height);
 
@@ -18280,6 +17508,7 @@ var VirtualRenderer = function(container, theme) {
             this.$loop.schedule(this.CHANGE_FULL);
         } else {
             this.$computeLayerConfig();
+            this.$loop.schedule(this.CHANGE_MARKER);
         }
     };
     this.adjustWrapLimit = function() {
@@ -18342,6 +17571,19 @@ var VirtualRenderer = function(container, theme) {
         return this.getOption("highlightGutterLine");
     };
 
+    this.$updateGutterLineHighlight = function() {
+        var pos = this.$cursorLayer.$pixelPos;
+        var height = this.layerConfig.lineHeight;
+        if (this.session.getUseWrapMode()) {
+            var cursor = this.session.selection.getCursor();
+            cursor.column = 0;
+            pos = this.$cursorLayer.getPixelPosition(cursor, true);
+            height *= this.session.getRowLength(cursor.row);
+        }
+        this.$gutterLineHighlight.style.top = pos.top - this.layerConfig.offset + "px";
+        this.$gutterLineHighlight.style.height = height + "px";
+    };
+
     this.$updatePrintMargin = function() {
         if (!this.$showPrintMargin && !this.$printMarginEl)
             return;
@@ -18374,51 +17616,35 @@ var VirtualRenderer = function(container, theme) {
     this.$moveTextAreaToCursor = function() {
         var style = this.textarea.style;
         if (!this.$keepTextAreaAtCursor) {
-            dom.translate(this.textarea, -100, 0);
+            style.left = -100 + "px";
             return;
         }
-        var pixelPos = this.$cursorLayer.$pixelPos;
-        if (!pixelPos)
-            return;
-        var composition = this.$composition;
-        if (composition && composition.markerRange)
-            pixelPos = this.$cursorLayer.getPixelPosition(composition.markerRange.start, true);
-        
         var config = this.layerConfig;
-        var posTop = pixelPos.top;
-        var posLeft = pixelPos.left;
+        var posTop = this.$cursorLayer.$pixelPos.top;
+        var posLeft = this.$cursorLayer.$pixelPos.left;
         posTop -= config.offset;
 
-        var h = composition && composition.useTextareaForIME ? this.lineHeight : HIDE_TEXTAREA ? 0 : 1;
+        var h = this.lineHeight;
         if (posTop < 0 || posTop > config.height - h) {
-            dom.translate(this.textarea, 0, 0);
+            style.top = style.left = "0";
             return;
         }
 
-        var w = 1;
-        if (!composition) {
-            posTop += this.lineHeight;
+        var w = this.characterWidth;
+        if (this.$composition) {
+            var val = this.textarea.value.replace(/^\x01+/, "");
+            w *= (this.session.$getStringScreenWidth(val)[0]+2);
+            h += 2;
         }
-        else {
-            if (composition.useTextareaForIME) {
-                var val = this.textarea.value;
-                w = this.characterWidth * (this.session.$getStringScreenWidth(val)[0]);
-                h += 2;
-            }
-            else {
-                posTop += this.lineHeight + 2;
-            }
-        }
-        
         posLeft -= this.scrollLeft;
         if (posLeft > this.$size.scrollerWidth - w)
             posLeft = this.$size.scrollerWidth - w;
 
-        posLeft += this.gutterWidth + this.margin.left;
-
-        dom.setStyle(style, "height", h + "px");
-        dom.setStyle(style, "width", w + "px");
-        dom.translate(this.textarea, Math.min(posLeft, this.$size.scrollerWidth - w), Math.min(posTop, this.$size.height - h));
+        posLeft += this.gutterWidth;
+        style.height = h + "px";
+        style.width = w + "px";
+        style.left = Math.min(posLeft, this.$size.scrollerWidth - w) + "px";
+        style.top = Math.min(posTop, this.$size.height - h) + "px";
     };
     this.getFirstVisibleRow = function() {
         return this.layerConfig.firstRow;
@@ -18459,18 +17685,6 @@ var VirtualRenderer = function(container, theme) {
         sm.h = sm.left + sm.right;
         if (sm.top && this.scrollTop <= 0 && this.session)
             this.session.setScrollTop(-sm.top);
-        this.updateFull();
-    };
-    
-    this.setMargin = function(top, bottom, left, right) {
-        var sm = this.margin;
-        sm.top = top|0;
-        sm.bottom = bottom|0;
-        sm.right = right|0;
-        sm.left = left|0;
-        sm.v = sm.top + sm.bottom;
-        sm.h = sm.left + sm.right;
-        this.$updateCachedSize(true, this.gutterWidth, this.$size.width, this.$size.height);
         this.updateFull();
     };
     this.getHScrollBarAlwaysVisible = function() {
@@ -18555,17 +17769,13 @@ var VirtualRenderer = function(container, theme) {
             this.$updateScrollBarV();
             if (changes & this.CHANGE_H_SCROLL)
                 this.$updateScrollBarH();
-            
-            dom.translate(this.content, -this.scrollLeft, -config.offset);
-            
-            var width = config.width + 2 * this.$padding + "px";
-            var height = config.minHeight + "px";
-            
-            dom.setStyle(this.content.style, "width", width);
-            dom.setStyle(this.content.style, "height", height);
+            this.$gutterLayer.element.style.marginTop = (-config.offset) + "px";
+            this.content.style.marginTop = (-config.offset) + "px";
+            this.content.style.width = config.width + 2 * this.$padding + "px";
+            this.content.style.height = config.minHeight + "px";
         }
         if (changes & this.CHANGE_H_SCROLL) {
-            dom.translate(this.content, -this.scrollLeft, -config.offset);
+            this.content.style.marginLeft = -this.scrollLeft + "px";
             this.scroller.className = this.scrollLeft <= 0 ? "ace_scroller" : "ace_scroller ace_scroll-left";
         }
         if (changes & this.CHANGE_FULL) {
@@ -18576,6 +17786,7 @@ var VirtualRenderer = function(container, theme) {
             this.$markerFront.update(config);
             this.$cursorLayer.update(config);
             this.$moveTextAreaToCursor();
+            this.$highlightGutterLine && this.$updateGutterLineHighlight();
             this._signal("afterRender");
             return;
         }
@@ -18585,15 +17796,12 @@ var VirtualRenderer = function(container, theme) {
             else
                 this.$textLayer.scrollLines(config);
 
-            if (this.$showGutter) {
-                if (changes & this.CHANGE_GUTTER || changes & this.CHANGE_LINES)
-                    this.$gutterLayer.update(config);
-                else
-                    this.$gutterLayer.scrollLines(config);
-            }
+            if (this.$showGutter)
+                this.$gutterLayer.update(config);
             this.$markerBack.update(config);
             this.$markerFront.update(config);
             this.$cursorLayer.update(config);
+            this.$highlightGutterLine && this.$updateGutterLineHighlight();
             this.$moveTextAreaToCursor();
             this._signal("afterRender");
             return;
@@ -18612,14 +17820,11 @@ var VirtualRenderer = function(container, theme) {
             if (this.$showGutter)
                 this.$gutterLayer.update(config);
         }
-        else if (changes & this.CHANGE_CURSOR) {
-            if (this.$highlightGutterLine)
-                this.$gutterLayer.updateLineHighlight(config);
-        }
 
         if (changes & this.CHANGE_CURSOR) {
             this.$cursorLayer.update(config);
             this.$moveTextAreaToCursor();
+            this.$highlightGutterLine && this.$updateGutterLineHighlight();
         }
 
         if (changes & (this.CHANGE_MARKER | this.CHANGE_MARKER_FRONT)) {
@@ -18753,9 +17958,6 @@ var VirtualRenderer = function(container, theme) {
             gutterOffset : lineHeight ? Math.max(0, Math.ceil((offset + size.height - size.scrollerHeight) / lineHeight)) : 0,
             height : this.$size.scrollerHeight
         };
-
-        if (this.session.$bidiHandler)
-            this.session.$bidiHandler.setContentWidth(longestLine - this.$padding);
         return changes;
     };
 
@@ -18994,7 +18196,7 @@ var VirtualRenderer = function(container, theme) {
         if (this.$hasCssTransforms) {
             canvasPos = {top:0, left: 0};
             var p = this.$fontMetrics.transformCoordinates([x, y]);
-            x = p[1] - this.gutterWidth - this.margin.left;
+            x = p[1] - this.gutterWidth;
             y = p[0];
         } else {
             canvasPos = this.scroller.getBoundingClientRect();
@@ -19013,7 +18215,7 @@ var VirtualRenderer = function(container, theme) {
         if (this.$hasCssTransforms) {
             canvasPos = {top:0, left: 0};
             var p = this.$fontMetrics.transformCoordinates([x, y]);
-            x = p[1] - this.gutterWidth - this.margin.left;
+            x = p[1] - this.gutterWidth;
             y = p[0];
         } else {
             canvasPos = this.scroller.getBoundingClientRect();
@@ -19023,7 +18225,7 @@ var VirtualRenderer = function(container, theme) {
         var offset = offsetX / this.characterWidth;
         var col = this.$blockCursor ? Math.floor(offset) : Math.round(offset);
 
-        var row = Math.floor((y + this.scrollTop - canvasPos.top) / this.lineHeight);
+        var row = (y + this.scrollTop - canvasPos.top) / this.lineHeight;
 
         return this.session.screenToDocumentPosition(row, Math.max(col, 0), offsetX);
     };
@@ -19048,67 +18250,29 @@ var VirtualRenderer = function(container, theme) {
     this.visualizeBlur = function() {
         dom.removeCssClass(this.container, "ace_focus");
     };
-    this.showComposition = function(composition) {
-        this.$composition = composition;
-        if (!composition.cssText) {
-            composition.cssText = this.textarea.style.cssText;
-            composition.keepTextAreaAtCursor = this.$keepTextAreaAtCursor;
-        }
-        composition.useTextareaForIME = this.$useTextareaForIME;
-        
-        if (this.$useTextareaForIME) {
-            this.$keepTextAreaAtCursor = true;
-            dom.addCssClass(this.textarea, "ace_composition");
-            this.textarea.style.cssText = "";
-            this.$moveTextAreaToCursor();
-            this.$cursorLayer.element.style.display = "none";
-        }
-        else {            
-            composition.markerId = this.session.addMarker(composition.markerRange, "ace_composition_marker", "text");
-        }
+    this.showComposition = function(position) {
+        if (!this.$composition)
+            this.$composition = {
+                keepTextAreaAtCursor: this.$keepTextAreaAtCursor,
+                cssText: this.textarea.style.cssText
+            };
+
+        this.$keepTextAreaAtCursor = true;
+        dom.addCssClass(this.textarea, "ace_composition");
+        this.textarea.style.cssText = "";
+        this.$moveTextAreaToCursor();
     };
     this.setCompositionText = function(text) {
-        var cursor = this.session.selection.cursor;
-        this.addToken(text, "composition_placeholder", cursor.row, cursor.column);
         this.$moveTextAreaToCursor();
     };
     this.hideComposition = function() {
         if (!this.$composition)
             return;
-        
-        if (this.$composition.markerId)
-            this.session.removeMarker(this.$composition.markerId);
 
         dom.removeCssClass(this.textarea, "ace_composition");
         this.$keepTextAreaAtCursor = this.$composition.keepTextAreaAtCursor;
         this.textarea.style.cssText = this.$composition.cssText;
         this.$composition = null;
-        this.$cursorLayer.element.style.display = "";
-    };
-    
-    this.addToken = function(text, type, row, column) {
-        var session = this.session;
-        session.bgTokenizer.lines[row] = null;
-        var newToken = {type: type, value: text};
-        var tokens = session.getTokens(row);
-        if (column == null) {
-            tokens.push(newToken);
-        } else {
-            var l = 0;
-            for (var i =0; i < tokens.length; i++) {
-                var token = tokens[i];
-                l += token.value.length;
-                if (column <= l) {
-                    var diff = token.value.length - (l - column);
-                    var before = token.value.slice(0, diff);
-                    var after = token.value.slice(diff);
-    
-                    tokens.splice(i, 1, {type: token.type, value: before},  newToken,  {type: token.type, value: after});
-                    break;
-                }
-            }
-        }
-        this.updateLines(row, row);
     };
     this.setTheme = function(theme, cb) {
         var _self = this;
@@ -19167,17 +18331,18 @@ var VirtualRenderer = function(container, theme) {
     };
     
     this.setCursorStyle = function(style) {
-        dom.setStyle(this.scroller.style, "cursor", style);
+        if (this.scroller.style.cursor != style)
+            this.scroller.style.cursor = style;
     };
     this.setMouseCursor = function(cursorStyle) {
-        dom.setStyle(this.scroller.style, "cursor", cursorStyle);
+        this.scroller.style.cursor = cursorStyle;
     };
     
     this.attachToShadowRoot = function() {
         dom.importCssString(editorCss, "ace_editor.css", this.container);
     };
     this.destroy = function() {
-        this.$fontMetrics.destroy();
+        this.$textLayer.destroy();
         this.$cursorLayer.destroy();
     };
 
@@ -19227,8 +18392,12 @@ config.defineOptions(VirtualRenderer.prototype, "renderer", {
         initialValue: false
     },
     showFoldWidgets: {
+        set: function(show) {this.$gutterLayer.setShowFoldWidgets(show);},
+        initialValue: true
+    },
+    showLineNumbers: {
         set: function(show) {
-            this.$gutterLayer.setShowFoldWidgets(show);
+            this.$gutterLayer.setShowLineNumbers(show);
             this.$loop.schedule(this.CHANGE_GUTTER);
         },
         initialValue: true
@@ -19242,10 +18411,19 @@ config.defineOptions(VirtualRenderer.prototype, "renderer", {
     },
     highlightGutterLine: {
         set: function(shouldHighlight) {
-            this.$gutterLayer.setHighlightGutterLine(shouldHighlight);
-            this.$loop.schedule(this.CHANGE_GUTTER);
+            if (!this.$gutterLineHighlight) {
+                this.$gutterLineHighlight = dom.createElement("div");
+                this.$gutterLineHighlight.className = "ace_gutter-active-line";
+                this.$gutter.appendChild(this.$gutterLineHighlight);
+                return;
+            }
+
+            this.$gutterLineHighlight.style.display = shouldHighlight ? "" : "none";
+            if (this.$cursorLayer.$pixelPos)
+                this.$updateGutterLineHighlight();
         },
-        initialValue: true
+        initialValue: false,
+        value: true
     },
     hScrollBarAlwaysVisible: {
         set: function(val) {
@@ -19261,7 +18439,7 @@ config.defineOptions(VirtualRenderer.prototype, "renderer", {
         },
         initialValue: false
     },
-    fontSize: {
+    fontSize:  {
         set: function(size) {
             if (typeof size == "number")
                 size = size + "px";
@@ -19283,8 +18461,6 @@ config.defineOptions(VirtualRenderer.prototype, "renderer", {
     },
     minLines: {
         set: function(val) {
-            if (!(this.$minLines < 0x1ffffffffffff))
-                this.$minLines = 0;
             this.updateFull();
         }
     },
@@ -19318,16 +18494,13 @@ config.defineOptions(VirtualRenderer.prototype, "renderer", {
         handlesSet: true
     },
     hasCssTransforms: {
-    },
-    useTextareaForIME: {
-        initialValue: !useragent.isMobile && !useragent.isIE
     }
 });
 
 exports.VirtualRenderer = VirtualRenderer;
 });
 
-ace.define("ace/worker/worker_client",["require","exports","module","ace/lib/oop","ace/lib/net","ace/lib/event_emitter","ace/config"], function(require, exports, module) {
+ace.define("ace/worker/worker_client",[], function(require, exports, module) {
 "use strict";
 
 var oop = require("../lib/oop");
@@ -19451,8 +18624,6 @@ var WorkerClient = function(topLevelNamespaces, mod, classname, workerUrl, impor
 
     this.emit = function(event, data) {
         try {
-            if (data.data && data.data.err)
-                data.data.err = {message: data.data.err.message, stack: data.data.err.stack, code: data.data.err.code};
             this.$worker.postMessage({event: event, data: {data: data.data}});
         }
         catch(ex) {
@@ -19552,7 +18723,7 @@ exports.createWorker = createWorker;
 
 });
 
-ace.define("ace/placeholder",["require","exports","module","ace/range","ace/lib/event_emitter","ace/lib/oop"], function(require, exports, module) {
+ace.define("ace/placeholder",[], function(require, exports, module) {
 "use strict";
 
 var Range = require("./range").Range;
@@ -19720,7 +18891,7 @@ var PlaceHolder = function(session, length, pos, others, mainClass, othersClass)
 exports.PlaceHolder = PlaceHolder;
 });
 
-ace.define("ace/mouse/multi_select_handler",["require","exports","module","ace/lib/event","ace/lib/useragent"], function(require, exports, module) {
+ace.define("ace/mouse/multi_select_handler",[], function(require, exports, module) {
 
 var event = require("../lib/event");
 var useragent = require("../lib/useragent");
@@ -19863,7 +19034,6 @@ function onMouseDown(e) {
         screenCursor = {row: -1, column: -1};
 
         var onMouseSelectionEnd = function(e) {
-            blockSelect();
             clearInterval(timerId);
             editor.removeSelectionMarkers(rectSel);
             if (!rectSel.length)
@@ -19892,7 +19062,7 @@ exports.onMouseDown = onMouseDown;
 
 });
 
-ace.define("ace/commands/multi_select_commands",["require","exports","module","ace/keyboard/hash_handler"], function(require, exports, module) {
+ace.define("ace/commands/multi_select_commands",[], function(require, exports, module) {
 exports.defaultCommands = [{
     name: "addCursorAbove",
     exec: function(editor) { editor.selectMoreLines(-1); },
@@ -19972,7 +19142,7 @@ exports.keyboardHandler = new HashHandler(exports.multiSelectCommands);
 
 });
 
-ace.define("ace/multi_select",["require","exports","module","ace/range_list","ace/range","ace/selection","ace/mouse/multi_select_handler","ace/lib/event","ace/lib/lang","ace/commands/multi_select_commands","ace/search","ace/edit_session","ace/editor","ace/config"], function(require, exports, module) {
+ace.define("ace/multi_select",[], function(require, exports, module) {
 
 var RangeList = require("./range_list").RangeList;
 var Range = require("./range").Range;
@@ -20056,6 +19226,8 @@ var EditSession = require("./edit_session").EditSession;
         var removed = this.rangeList.merge();
         if (removed.length)
             this.$onRemoveRange(removed);
+        else if(this.ranges[0])
+            this.fromOrientedRange(this.ranges[0]);
     };
 
     this.$onAddRange = function(range) {
@@ -20365,8 +19537,6 @@ var Editor = require("./editor").Editor;
         this.inVirtualSelectionMode = false;
         selection._eventRegistry = reg;
         selection.mergeOverlappingRanges();
-        if (selection.ranges[0])
-            selection.fromOrientedRange(selection.ranges[0]);
         
         var anim = this.renderer.$scrollAnimation;
         this.onCursorChange();
@@ -20514,7 +19684,6 @@ var Editor = require("./editor").Editor;
             range.start.row = tmp.start.row;
             range.start.column = tmp.start.column;
         }
-        sel.fromOrientedRange(sel.ranges[0]);
     };
     this.selectMore = function(dir, skip, stopAtFirst) {
         var session = this.session;
@@ -20781,7 +19950,7 @@ require("./config").defineOptions(Editor.prototype, "editor", {
 
 });
 
-ace.define("ace/mode/folding/fold_mode",["require","exports","module","ace/range"], function(require, exports, module) {
+ace.define("ace/mode/folding/fold_mode",[], function(require, exports, module) {
 "use strict";
 
 var Range = require("../../range").Range;
@@ -20870,7 +20039,7 @@ var FoldMode = exports.FoldMode = function() {};
 
 });
 
-ace.define("ace/theme/textmate",["require","exports","module","ace/lib/dom"], function(require, exports, module) {
+ace.define("ace/theme/textmate",[], function(require, exports, module) {
 "use strict";
 
 exports.isDark = false;
@@ -21001,7 +20170,7 @@ var dom = require("../lib/dom");
 dom.importCssString(exports.cssText, exports.cssClass);
 });
 
-ace.define("ace/line_widgets",["require","exports","module","ace/lib/oop","ace/lib/dom","ace/range"], function(require, exports, module) {
+ace.define("ace/line_widgets",[], function(require, exports, module) {
 "use strict";
 
 var oop = require("./lib/oop");
@@ -21353,7 +20522,7 @@ exports.LineWidgets = LineWidgets;
 
 });
 
-ace.define("ace/ext/error_marker",["require","exports","module","ace/line_widgets","ace/lib/dom","ace/range"], function(require, exports, module) {
+ace.define("ace/ext/error_marker",[], function(require, exports, module) {
 "use strict";
 var LineWidgets = require("../line_widgets").LineWidgets;
 var dom = require("../lib/dom");
@@ -21539,7 +20708,7 @@ dom.importCssString("\
 
 });
 
-ace.define("ace/ace",["require","exports","module","ace/lib/fixoldbrowsers","ace/lib/dom","ace/lib/event","ace/range","ace/editor","ace/edit_session","ace/undomanager","ace/virtual_renderer","ace/worker/worker_client","ace/keyboard/hash_handler","ace/placeholder","ace/multi_select","ace/mode/folding/fold_mode","ace/theme/textmate","ace/ext/error_marker","ace/config"], function(require, exports, module) {
+ace.define("ace/ace",[], function(require, exports, module) {
 "use strict";
 
 require("./lib/fixoldbrowsers");
@@ -21614,7 +20783,7 @@ exports.Range = Range;
 exports.EditSession = EditSession;
 exports.UndoManager = UndoManager;
 exports.VirtualRenderer = Renderer;
-exports.version = "1.4.1";
+exports.version = "1.3.3";
 });
             (function() {
                 ace.require(["ace/ace"], function(a) {

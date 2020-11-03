@@ -1,4 +1,4 @@
-ace.define("ace/keyboard/vim",["require","exports","module","ace/range","ace/lib/event_emitter","ace/lib/dom","ace/lib/oop","ace/lib/keys","ace/lib/event","ace/search","ace/lib/useragent","ace/search_highlight","ace/commands/multi_select_commands","ace/mode/text","ace/multi_select"], function(require, exports, module) {
+ace.define("ace/keyboard/vim",[], function(require, exports, module) {
   'use strict';
 
   function log() {
@@ -156,8 +156,6 @@ ace.define("ace/keyboard/vim",["require","exports","module","ace/range","ace/lib
     this.curOp.force = force;
     var result = fn();
     if (this.ace.curOp && this.ace.curOp.command.name == "vim") {
-      if (this.state.dialog)
-        this.ace.curOp.command.scrollIntoView = false;
       this.ace.endOperation();
       if (!curOp.cursorActivity && !curOp.lastChange && prevOp)
         this.ace.prevOp = prevOp;
@@ -677,18 +675,18 @@ dom.importCssString(".normal-mode .ace_cursor{\
 .ace_dialog {\
   position: absolute;\
   left: 0; right: 0;\
-  background: inherit;\
+  background: white;\
   z-index: 15;\
   padding: .1em .8em;\
   overflow: hidden;\
-  color: inherit;\
+  color: #333;\
 }\
 .ace_dialog-top {\
-  border-bottom: 1px solid #444;\
+  border-bottom: 1px solid #eee;\
   top: 0;\
 }\
 .ace_dialog-bottom {\
-  border-top: 1px solid #444;\
+  border-top: 1px solid #eee;\
   bottom: 0;\
 }\
 .ace_dialog input {\
@@ -731,19 +729,11 @@ dom.importCssString(".normal-mode .ace_cursor{\
 
     var dialog = dialogDiv(this, template, options.bottom);
     var closed = false, me = this;
-    this.state.dialog = dialog;
     function close(newVal) {
       if (typeof newVal == 'string') {
         inp.value = newVal;
       } else {
         if (closed) return;
-        
-        if (newVal && newVal.type == "blur") {
-          if (document.activeElement === inp)
-            return;
-        }
-        
-        me.state.dialog = null;
         closed = true;
         dialog.parentNode.removeChild(dialog);
         me.focus();
@@ -4030,10 +4020,8 @@ dom.importCssString(".normal-mode .ace_cursor{\
         cm.openDialog(template, onClose, { bottom: true, value: options.value,
             onKeyDown: options.onKeyDown, onKeyUp: options.onKeyUp,
             selectValueOnOpen: false, onClose: function() {
-              if (cm.state.vim) {
-                cm.state.vim.status = "";
-                cm.ace.renderer.$loop.schedule(cm.ace.renderer.CHANGE_CURSOR);
-              }
+              cm.state.vim.status = "";
+              cm.ace.renderer.$loop.schedule(cm.ace.renderer.CHANGE_CURSOR);
             }});
       }
       else {
@@ -5386,7 +5374,7 @@ dom.importCssString(".normal-mode .ace_cursor{\
     var name = '';
     if (e.ctrlKey) { name += 'C-'; }
     if (e.altKey) { name += 'A-'; }
-    if ((name || key.length > 1) && e.shiftKey) { name += 'S-'; }
+    if (e.shiftKey) { name += 'S-'; }
 
     name += key;
     if (name.length > 1) { name = '<' + name + '>'; }
@@ -5455,15 +5443,13 @@ dom.importCssString(".normal-mode .ace_cursor{\
           cm.curOp.cursorActivity = false;
       }, true);
     }
-    if (isHandled)
-      handleExternalSelection(cm, vim);
     return isHandled;
   }
   exports.CodeMirror = CodeMirror;
   var getVim = Vim.maybeInitVimState_;
   exports.handler = {
     $id: "ace/keyboard/vim",
-    drawCursor: function(element, pixelPos, config, sel, session) {
+    drawCursor: function(style, pixelPos, config, sel, session) {
       var vim = this.state.vim || {};
       var w = config.characterWidth;
       var h = config.lineHeight;
@@ -5480,9 +5466,10 @@ dom.importCssString(".normal-mode .ace_cursor{\
         h = h / 2;
         top += h;
       }
-      dom.translate(element, left, top);
-      dom.setStyle(element.style, "width", w + "px");
-      dom.setStyle(element.style, "height", h + "px");
+      style.left = left + "px";
+      style.top =  top + "px";
+      style.width = w + "px";
+      style.height = h + "px";
     },
     handleKeyboard: function(data, hashId, key, keyCode, e) {
       var editor = data.editor;
@@ -5578,6 +5565,7 @@ dom.importCssString(".normal-mode .ace_cursor{\
       }
       updateInputMode();
       editor.renderer.$cursorLayer.drawCursor = this.drawCursor.bind(cm);
+      this.updateMacCompositionHandlers(editor, true);
     },
     detach: function(editor) {
       var cm = editor.state.cm;
@@ -5589,6 +5577,7 @@ dom.importCssString(".normal-mode .ace_cursor{\
       editor.renderer.setStyle("normal-mode", false);
       editor.textInput.setCommandMode(false);
       editor.renderer.$keepTextAreaAtCursor = true;
+      this.updateMacCompositionHandlers(editor, false);
     },
     getStatusText: function(editor) {
       var cm = editor.state.cm;
@@ -5606,6 +5595,61 @@ dom.importCssString(".normal-mode .ace_cursor{\
       if (vim.status)
         status += (status ? " " : "") + vim.status;
       return status;
+    },
+    updateMacCompositionHandlers: function(editor, enable) {
+      var onCompositionUpdateOverride = function(text) {
+        var cm = editor.state.cm;
+        var vim = getVim(cm);
+        if (!vim.insertMode) {
+          var el = this.textInput.getElement();
+          el.blur();
+          el.focus();
+          el.value = text;
+        } else {
+          this.onCompositionUpdateOrig(text);
+        }
+      };
+      var onCompositionStartOverride = function(text) {
+        var cm = editor.state.cm;
+        var vim = getVim(cm);
+        if (vim.insertMode) {
+          this.onCompositionStartOrig(text);
+        }
+      };
+      if (enable) {
+        if (!editor.onCompositionUpdateOrig) {
+          editor.onCompositionUpdateOrig = editor.onCompositionUpdate;
+          editor.onCompositionUpdate = onCompositionUpdateOverride;
+          editor.onCompositionStartOrig = editor.onCompositionStart;
+          editor.onCompositionStart = onCompositionStartOverride;
+        }
+      } else {
+        if (editor.onCompositionUpdateOrig) {
+          editor.onCompositionUpdate = editor.onCompositionUpdateOrig;
+          editor.onCompositionUpdateOrig = null;
+          editor.onCompositionStart = editor.onCompositionStartOrig;
+          editor.onCompositionStartOrig = null;
+        }
+      }
+    }
+  };
+  var renderVirtualNumbers = {
+    getText: function(session, row) {
+      return (Math.abs(session.selection.lead.row - row)  || (row + 1 + (row < 9? "\xb7" : "" ))) + "";
+    },
+    getWidth: function(session, lastLineNumber, config) {
+      return session.getLength().toString().length * config.characterWidth;
+    },
+    update: function(e, editor) {
+      editor.renderer.$loop.schedule(editor.renderer.CHANGE_GUTTER);
+    },
+    attach: function(editor) {
+      editor.renderer.$gutterLayer.$renderer = this;
+      editor.on("changeSelection", this.update);
+    },
+    detach: function(editor) {
+      editor.renderer.$gutterLayer.$renderer = null;
+      editor.off("changeSelection", this.update);
     }
   };
   Vim.defineOption({
