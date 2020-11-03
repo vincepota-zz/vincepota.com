@@ -34,9 +34,6 @@ def initsignal(pelicanobj):
     global RMD, FIG_PATH
     try:
         startr()
-        R_OBJECTS.r('Sys.setlocale("LC_ALL", "C")')
-        R_OBJECTS.r('Sys.setlocale("LC_NUMERIC", "C")')
-        R_OBJECTS.r('Sys.setlocale("LC_MESSAGES", "C")')
         
         idx = KNITR.opts_knit.names.index('set')
         path = pelicanobj.settings.get('PATH','%s/content' % settings.DEFAULT_CONFIG.get('PATH'))
@@ -61,7 +58,7 @@ class RmdReader(readers.BaseReader):
     file_extensions = ['Rmd', 'rmd']
 
     @property
-    def enabled():
+    def enabled(self):
         return RMD
 
     # You need to have a read method, which takes a filename and returns
@@ -104,7 +101,7 @@ class RmdReader(readers.BaseReader):
 opts_knit$set(unnamed.chunk.label="{unnamed_chunk_label}")
 render_markdown()
 hook_plot <- knit_hooks$get('plot')
-knit_hooks$set(plot=function(x, options) hook_plot(paste0("{{filename}}/", x), options))
+knit_hooks$set(plot=function(x, options) hook_plot(paste0("{{static}}/", x), options))
             '''.format(unnamed_chunk_label=chunk_label))
         with warnings.catch_warnings():
             warnings.simplefilter("ignore")

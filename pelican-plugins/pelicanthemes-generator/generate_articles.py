@@ -14,20 +14,12 @@ from jinja2 import Environment, FileSystemLoader, meta
 
 # Search all template files
 def list_themes(themesroot):
-    ignore = [
-        'dev-random', 'dev-random2', 'html5-dopetrope', 'irfan',
-        'nmnlist', 'pelican-bootstrap3', 'storm', 'syte',
-        'bold', 'bootlex', 'bootstrap', 'built-texts', 'elegant',
-        'gum', 'lannisport', 'pure', 'tuxlite_tbs',
-    ]
     dirlist = []
-
     allfiles = os.listdir(themesroot)
     for dirname in allfiles:
         dirname = dirname.lower()
-        if dirname not in ignore:
-            if os.path.isdir('%s/%s/templates' % (themesroot, dirname)):
-                dirlist.append(dirname)
+        if os.path.isdir('%s/%s/templates' % (themesroot, dirname)):
+            dirlist.append(dirname)
 
     return sorted(dirlist)
 
@@ -43,6 +35,9 @@ def get_variables(filename):
 
 # Generate all themes article
 def generate_themes_article(themesroot):
+    # Prepare content directory
+    if not os.path.exists('content'):
+        os.makedirs('content')
 
     themes = list_themes(themesroot)
     os.system("rm content/*")
@@ -106,6 +101,12 @@ def generate_themes_article(themesroot):
         except IOError:
             pass
 
+def create_directories():
+    dirs = ['output', 'content/static', 'confs']
+    for directory in dirs:
+        if not os.path.exists(directory):
+            os.makedirs(directory)
+
 
 # Generate index themes summary
 def generate_summary_preview(themesroot):
@@ -143,5 +144,6 @@ def generate_summary_preview(themesroot):
 
 
 if len(sys.argv) == 2:
+    create_directories()
     generate_themes_article(sys.argv[1])
     generate_summary_preview(sys.argv[1])

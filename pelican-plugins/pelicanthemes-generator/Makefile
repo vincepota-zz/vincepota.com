@@ -10,6 +10,9 @@ PUBLISHCONF=$(BASEDIR)/publishconf.py
 PORT=8000
 
 # Pelican
+all: html confs articles screenshots
+.PHONY: html confs articles screenshots themes serve push upload
+
 html:
 	$(PELICAN) $(INPUTDIR) -o $(OUTPUTDIR) -s $(CONFFILE) $(PELICANOPTS)
 
@@ -18,6 +21,9 @@ confs:
 
 articles:
 	./generate_articles.py ../pelican-themes
+
+clean:
+	[ ! -d $(OUTPUTDIR) ] || rm -rf $(OUTPUTDIR)
 
 screenshots:
 	./generate_screenshots.py ../pelican-themes

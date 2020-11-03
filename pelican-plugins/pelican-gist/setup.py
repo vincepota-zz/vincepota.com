@@ -25,6 +25,7 @@ packages = [
 
 requires = [
     'requests>=2.2.0',
+    'pygments'
 ]
 
 tests_require = [
@@ -46,7 +47,7 @@ setup(
     install_requires=requires,
     tests_require=tests_require,
     license='MIT',
-    classifiers=(
+    classifiers=[
         'Development Status :: 4 - Beta',
         'Environment :: Console',
         'Intended Audience :: Developers',
@@ -56,8 +57,9 @@ setup(
         'Programming Language :: Python',
         'Programming Language :: Python :: 2.6',
         'Programming Language :: Python :: 2.7',
+        'Programming Language :: Python :: 3.6',
         'Topic :: Internet :: WWW/HTTP',
         'Topic :: Software Development :: Libraries :: Python Modules',
         'Topic :: Text Processing',
-    ),
+    ],
 )

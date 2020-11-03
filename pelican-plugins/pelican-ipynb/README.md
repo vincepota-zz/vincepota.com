@@ -1,71 +1,55 @@
-# Pelican plugin for Jupyter/IPython Notebooks
+# pelican-jupyter: Pelican plugin for Jupyter Notebooks
 
-This plugin provides two modes to use Jupyter/IPython notebooks in pelican:
+[![PyPI](https://badge.fury.io/py/pelican-jupyter.svg)](https://pypi.org/project/pelican-jupyter/)
+[![Testing](https://github.com/danielfrg/pelican-jupyter/workflows/test/badge.svg)](https://github.com/danielfrg/pelican-jupyter/actions)
+[![Coverage Status](https://codecov.io/gh/danielfrg/pelican-jupyter/branch/master/graph/badge.svg)](https://codecov.io/gh/danielfrg/pelican-jupyter?branch=master)
+[![License](http://img.shields.io/:license-Apache%202-blue.svg)](https://github.com/danielfrg/pelican-jupyter/blob/master/LICENSE.txt)
+
+## Installation
+
+```
+pip install pelican-jupyter
+```
+
+### Pelican and Jupyter versions
+
+The main focus is to run with the latest versions of the packages but there is a good chance the plugin will work correctly with older versions of Pelican and Jupyter/.
+The recommended version of libraries are:
+
+- `pelican>=4`
+- `notebook>=6`
+- `nbconvert>=5`
+
+## Usage
+
+This plugin provides two modes to use Jupyter notebooks in [Pelican](https://getpelican.com):
 
 1. As a new markup language so `.ipynb` files are recognized as a valid filetype for an article
 2. As a liquid tag based on the [liquid tags plugin](https://github.com/getpelican/pelican-plugins/tree/master/liquid_tags) so notebooks can be
 included in a regular post using Markdown (`.md`) files.
 
-## Requirements
+### Mode A: Markup Mode
 
-Python 2.7 and 3.4 are supported
+On your `pelicanconf.py`:
 
-The main objective is to run with the latest version of Jupyter/IPython
-but there is a good chance the plugin will work correctly with older versions of Pelican and Jupyter/IPython.
-The recommended version of libraries are:
+```python
+MARKUP = ("md", "ipynb")
 
-- `pelican>=3.5`
-- `jupyter>=1.0`
-- `ipython>=4.0`
-- `nbconvert>=4.0`
-- `beautifulsoup4`
+from pelican_jupyter import markup as nb_markup
+PLUGINS = [nb_markup]
 
-
-## Installation
-
-Download this repo and put all the `.py` files it into an `ipynb` directory
-into your `plugins` directory. The structure should look like this:
-
-```
-content
-plugins
-  ipynb
-    __init__.py
-    core.py
-    ipynb.py
-    liquid.py
-    markup.py
-    ... other files are optional ...
+IGNORE_FILES = [".ipynb_checkpoints"]
 ```
 
-See specific modes notes for settings in the `pelicanconf.py`:
+With this mode you need to pass the MD metadata to the plugins with one of this two options:
 
-If you host your site on git (i.e. github pages) you could use it as a submodule:
-
-```
-git submodule add git://github.com/danielfrg/pelican-ipynb.git plugins/ipynb
-```
-
-## Mode A: Markup Mode
-
-In the `pelicanconf.py`:
-```
-MARKUP = ('md', 'ipynb')
-
-PLUGIN_PATH = './plugins'
-PLUGINS = ['ipynb.markup']
-```
-
-### Option 1 (recommended)
-
-Write the post using the Jupyter Notebook interface, using markdown, equations, etc.
+#### Option 1: `.nbdata` metadata file
 
 Place the `.ipynb` file in the content folder and create a new file with the
-same name as the ipython notebook with extension `.ipynb-meta`.
-For example if you have `my_post.ipynb` create a `my_post.ipynb-meta`.
+same name as the ipython notebook with extension `.nbdata`.
+For example if you have `my_post.ipynb` create `my_post.nbdata`.
 
-The `.ipynb-meta` should have the markdown metadata (note the empty line at the end, you need that)
-of a regular pelican article:
+The `.nbdata` should contain the metadata like a regular Markdown based article (note the empty line at the end, you need it):
 
 ```
 Title:
@@ -78,48 +62,54 @@ Summary:
 
 ```
 
-### Option 2
-
-Open the `.ipynb` file in a text editor and look for the `metadata` tag should see.
-
-```
-{
-    "metadata": {
-        "name": "My notebook"
-        ... { A_LOT_OF_OTHER_STUFF } ...
-    },
-{ A_LOT_OF_OTHER_STUFF }
-```
-
-Edit this the `metadata` tag to have the required markdown metadata:
+You can specify to only include a subset of notebook cells with the
+`Subcells` metadata item.
+It should contain the index (starting at 0) of first and last cell to include
+(use `None` for open range).
+For example, to skip the first two cells:
 
 ```
-{
- "metadata": {
-        "name": "My notebook",
-        "Title": "Notebook using internal metadata",
-        "Date": "2100-12-31",
-        "Category": "Category",
-        "Tags": "tag1,tag2",
-        "slug": "with-metadata",
-        "Author": "Me"
-
-        ... { A_LOT_OF_OTHER_STUFF } ...
-    },
-    { A_LOT_OF_OTHER_STUFF }
+Subcells: [2, None]
 ```
 
-## Mode B: Liquid Tags
+### Option 2: Metadata cell in notebook
 
-Install the [liquid_tags plugin](https://github.com/getpelican/pelican-plugins/tree/master/liquid_tags).
-Only the base `liquid_tags.py` and `mdx_liquid_tags.py` files are needed.
+With this option, the metadata is extracted from the first cell of
+the notebook (which should be a Markdown cell), this cell is then ignored when the notebook is rendered.
 
-In the `pelicanconf.py`:
+On your `pelicanconf.py`:
+
+```python
+MARKUP = ("md", "ipynb")
+
+from pelican_jupyter import markup as nb_markup
+PLUGINS = [nb_markup]
+IPYNB_MARKUP_USE_FIRST_CELL = True
+
+IGNORE_FILES = [".ipynb_checkpoints"]
 ```
+
+Now, you can put the metadata in the first notebook cell in Markdown mode, like this:
+
+```markdown
+- title: My notebook
+- author: John Doe
+- date: 2018-05-11
+- category: pyhton
+- tags: pip
+```
+
+## Mode B: Liquid tags
+
+On your `pelicanconf.py`:
+
+```python
 MARKUP = ('md', )
 
-PLUGIN_PATH = './plugins'
-PLUGINS = ['ipynb.liquid']
+from pelican_jupyter import liquid as nb_liquid
+PLUGINS = [nb_liquid]
+
+IGNORE_FILES = [".ipynb_checkpoints"]
 ```
 
 After this you can use a liquid tag to include a notebook in any regular markdown article,
@@ -135,49 +125,73 @@ Author:
 Summary:
 
 {% notebook path/from/content/dir/to/notebook.ipynb %}
-
 ```
 
 ## Recommend mode?
 
-The only problem with the liquid tag mode is that it doesn't generate a summary for the article
-automatically from the notebook so you have to write it in the `.md` file that includes
-the notebook liquid tag.
+Personally I like Method A - Option 1 since I write the Notebooks first and then I just add
+the metadata file and keeps the notebook clean.
 
-So you end up writing two files, one `.md` with some text content
-and the `.ipynb` with the code/plots/equations that makes it a little bit annoying but can
-be useful in some cases.
+The Liquid tag mode provide more flexibility to combine an existing notebook code or output with extra text on a Markdown.
+You can also combine 2 or more notebooks in this mode.
+The only problem with the liquid tag mode is that it doesn't generate a summary for the article
+automatically from the notebook so you have to write it in the source `.md` file that includes the notebook.s
 
 You can use both modes at the same time but you are probably going to see a exception that
 prevents conflicts, ignore it.
 
 ## Note on CSS
 
-There might be some issues/conflicts regarding the CSS that the Jupyter Notebook requires and the pelican theme.
+If the notebooks look bad on your pelican theme this can help.
+
+There is some issues/conflicts regarding the CSS that the Jupyter Notebook requires and the pelican themes.
 
 I do my best to make the plugin work with every theme but for obvious reasons I cannot guarantee that it will look good in any pelican theme.
 
-I only try this plugin on the pelican theme for [my blog](https://github.com/danielfrg/danielfrg.github.io-source)
-while trying to make it the most general and useful out of the box as possible, a difficult compromise sometimes.
-
 Jupyter Notebook is based on bootstrap so you probably will need your theme to be based on that it if you want the html and css to render nicely.
 
-I try to inject only the necessary CSS, removing Jupyter's bootstrap but fixes are needed in some cases,
-if you find this issues I recommend looking at how my theme fixes them. You can suppress the inclusion of CSS entirely by setting
-`IPYNB_IGNORE_CSS=True` in `pelicanconf.py`. 
+I try to inject only the necessary CSS by removing Jupyter's bootstrap code and only injecting the extra CSS code.
+In some cases but fixes are needed, I recommend looking at how [my theme](https://github.com/danielfrg/danielfrg.com) fixes them.
 
+You can suppress the inclusion of any Notebook CSS entirely by setting `IPYNB_SKIP_CSS=True`, this allows more flexibility on the pelican theme.
 
-## Options
+The `IPYNB_EXPORT_TEMPLATE` option is another great way of extending the output natively using Jupyter nbconvert.
 
-You can include an `#ignore` comment anywhere in a cell of the Jupyter notebook
-to ignore it, removing it from the post content.
+## Settings
 
-On the `pelicanconf.py` you can set:
+**Note:** If you are using the Liquid mode you need to set the variables like this inside the `pelicanconf.py`.
 
-- `IPYNB_USE_META_SUMMARY`: boolean variable to use the summary provided in the `.ipynb-meta` file instead of creating it from the notebook.
-- `IPYNB_STOP_SUMMARY_TAGS`: list of tuple with the html tag and attribute (python HTMLParser format)
-when the summary creation should stop, this is usefull to generate valid/shorter summaries.
-`default = [('div', ('class', 'input')), ('div', ('class', 'output'))]`
-- `IPYNB_EXTEND_STOP_SUMMARY_TAGS`: list of tuples to extend the default `IPYNB_STOP_SUMMARY_TAGS`
-- `IGNORE_FILES = ['.ipynb_checkpoints']`: prevents pelican from trying to parse notebook checkpoint files
-- `IPYNB_IGNORE_CSS = True`: do not include the notebook CSS in the generated output
+```
+LIQUID_CONFIGS = (("IPYNB_EXPORT_TEMPLATE", "notebook.tpl", ""), )
+```
+
+If you are using the Markup mode then just add this variables to your `pelicanconf.py`.
+
+| Setting | Description |
+|---|---|
+| `IPYNB_FIX_CSS = True` | [markup and liquid] Do not apply any of the plugins "fixes" to the Jupyter CSS use all the default Jupyter CSS. |
+| `IPYNB_SKIP_CSS = False` | [markup and liquid] Do not include (at all) the notebook CSS in the generated output. This is usefull if you want to include it yourself in the theme. |
+| `IPYNB_PREPROCESSORS` | [markup and liquid] A list of nbconvert preprocessors to be used when generating the HTML output. |
+| `IPYNB_EXPORT_TEMPLATE` | [markup and liquid] Path to nbconvert export template (relative to project root). For example: Create a custom template that extends from the `basic` template and adds some custom CSS and JavaScript, more info here [docs](http://nbconvert.readthedocs.io/en/latest/customizing.html) and [example here](https://github.com/jupyter/nbconvert/blob/master/nbconvert/templates/html/basic.tpl). |
+| `IPYNB_STOP_SUMMARY_TAGS = [('div', ('class', 'input')), ('div', ('class', 'output')), ('h2', ('id', 'Header-2'))]` | [markup only] List of tuples with the html tag and attribute (python HTMLParser format) that are used to stop the summary creation, this is useful to generate valid/shorter summaries. |
+| `IPYNB_GENERATE_SUMMARY = True` | [markup only] Create a summary based on the notebook content. Every notebook can still use the s`Summary` from the metadata to overwrite this. |
+| `IPYNB_EXTEND_STOP_SUMMARY_TAGS` | [markup only] List of tuples to extend the default `IPYNB_STOP_SUMMARY_TAGS`. |
+| `IPYNB_NB_SAVE_AS` | [markup only] If you want to make the original notebook available set this variable in a  is similar way to the default pelican `ARTICLE_SAVE_AS` setting. This will also add a metadata field `nb_path` which can be used in the theme. e.g. `blog/{date:%Y}/{date:%m}/{date:%d}/{slug}/notebook.ipynb` |
+| `IPYNB_COLORSCHEME` | [markup only] Change the pygments colorscheme used for syntax highlighting |
+| `IGNORE_FILES = ['.ipynb_checkpoints']` | [Pelican setting useful for markup] Prevents pelican from trying to parse notebook checkpoint files. |
+
+Example template for `IPYNB_EXPORT_TEMPLATE`:
+
+```
+{%- extends 'basic.tpl' -%}
+
+{% block header %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+<style type="text/css">
+div.code_cell {
+    border: 2px solid red;
+}
+</style>
+{%- endblock header %}
+```

@@ -13,17 +13,11 @@ from jinja2 import Environment, FileSystemLoader, meta
 
 
 def list_themes(themesroot):
-    ignore = [
-        'dev-random', 'dev-random2', 'html5-dopetrope', 'irfan',
-        'nmnlist', 'pelican-bootstrap3', 'storm', 'syte',
-    ]
     dirlist = []
-
     allfiles = os.listdir(themesroot)
     for dirname in allfiles:
-        if dirname not in ignore:
-            if os.path.isdir('%s/%s/templates' % (themesroot, dirname)):
-                dirlist.append(dirname)
+        if os.path.isdir('%s/%s/templates' % (themesroot, dirname)):
+            dirlist.append(dirname)
 
     return sorted(dirlist)
 
@@ -57,10 +51,12 @@ def get_all_tpl_vars(themesroot, themename):
     tpldir = "%s/%s/templates" % (themesroot, themename)
     files = os.listdir(tpldir)
     for fname in files:
-        variables = get_variables(themesroot, themename, fname)
-        for var in variables:
-            if var.isupper():
-                all_vars.add(var)
+        filename = '%s/%s' % (tpldir, fname)
+        if os.path.isfile(filename):
+            variables = get_variables(themesroot, themename, fname)
+            for var in variables:
+                if var.isupper():
+                    all_vars.add(var)
 
     return sorted(all_vars)
 
@@ -77,32 +73,40 @@ def themeconf(themesroot, themename):
     ex:
       themeconf jesuislibre /dir/officialblogsrc/pelicanconf.py
     """
-    all_vars = get_all_tpl_vars(themesroot, themename)
+    try:
+        all_vars = get_all_tpl_vars(themesroot, themename)
 
-    pconf = '%s/%s/pelicanconf_sample.py' % (themesroot, themename)
-    if os.path.exists(pconf):
-        sys.path.append(os.path.abspath(os.path.dirname(pconf)))
-        m = __import__(os.path.basename(pconf.replace('.py', '')))
-    else:
-        m = str  # tips, empty __dict__, todo, change this tips
-
-    # TODO found a solution for out the UTF8
-    # text = "#!/usr/bin/env python\n# -*- coding: utf-8 -*- #\nfrom __future__ import unicode_literals\n\n"
-
-    # Show pelicanconf.py vars content
-    text = ""
-    for var in all_vars:
-        if var in m.__dict__:
-            text += "%s = %s\n" % (var, repr(m.__dict__[var]))
+        pconf = '%s/%s/pelicanconf_sample.py' % (themesroot, themename)
+        if os.path.exists(pconf):
+            sys.path.append(os.path.abspath(os.path.dirname(pconf)))
+            m = __import__(os.path.basename(pconf.replace('.py', '')))
         else:
-            text += "# %s =\n" % var
+            m = str  # tips, empty __dict__, todo, change this tips
 
-    writetext('./confs/%s_pelicanconf.py' % themename, text)
+        # TODO found a solution for out the UTF8
+        # text = "#!/usr/bin/env python\n# -*- coding: utf-8 -*- #\nfrom __future__ import unicode_literals\n\n"
 
+        # Show pelicanconf.py vars content
+        text = ""
+        for var in all_vars:
+            if var in m.__dict__:
+                text += "%s = %s\n" % (var, repr(m.__dict__[var]))
+            else:
+                text += "# %s =\n" % var
+
+        writetext('./confs/%s_pelicanconf.py' % themename, text)
+    except Exception, e:
+        print "### Error for %s theme(%s) ###" % (themename, e)
+
+def create_directories():
+    dirs = ['output', 'content/static', 'confs']
+    for directory in dirs:
+        if not os.path.exists(directory):
+            os.makedirs(directory)
 
 def generateconfs(themesroot):
+    create_directories()
     themes = list_themes(themesroot)
-
     for theme in themes:
         print ("generate conf for %s theme" % theme)
         themeconf(themesroot, theme)

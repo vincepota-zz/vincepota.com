@@ -1,9 +1,16 @@
 Multi Neighbors Plugin for Pelican
 ==================================
 
-This plugin adds ``next_articles`` (a sequence of newer articles) and
-``prev_articles`` (a sequence of older articles) variables to the article's
-context.
+.. image:: https://travis-ci.org/davidlesieur/multi_neighbors.svg?branch=master
+    :target: https://travis-ci.org/davidlesieur/multi_neighbors
+
+.. image:: https://codecov.io/gh/davidlesieur/multi_neighbors/branch/master/graph/badge.svg
+    :target: https://codecov.io/gh/davidlesieur/multi_neighbors
+
+
+This `Pelican <https://getpelican.com>`_ plugin adds the ``next_articles`` (a
+list of newer articles) and ``prev_articles`` (a list of older articles)
+variables to every article's context.
 
 
 Usage
@@ -13,14 +20,13 @@ To install this plugin, see `How to use plugins
 <http://docs.getpelican.com/en/latest/plugins.html>`__ from the Pelican
 documentation.
 
-In ``pelicanconf.py``, configure the maximum number of articles to list. For
-example:
+By default, up to 5 neighbors are listed in each direction. You may customize
+this value by defining ``MULTI_NEIGHBORS`` in your settings file, e.g.::
 
-.. code-block::
+    MULTI_NEIGHBORS = 3
 
-    MULTI_NEIGHBORS = 5
-
-Output the variables in your article template:
+The code to output the variables in your article template might look like the
+following:
 
 .. code-block:: html+jinja
 
@@ -52,3 +58,12 @@ Output the variables in your article template:
             </ul>
         </nav>
     {% endif %}
+
+
+Running the tests
+-----------------
+
+Tests use the `unittest <https://docs.python.org/3/library/unittest.html>`__
+framework and may be run with the following command::
+
+    python -m unittest -v test_multi_neighbors
