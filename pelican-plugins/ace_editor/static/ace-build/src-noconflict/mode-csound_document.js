@@ -1,4 +1,4 @@
-ace.define("ace/mode/csound_preprocessor_highlight_rules",["require","exports","module","ace/lib/oop","ace/mode/text_highlight_rules"], function(require, exports, module) {
+ace.define("ace/mode/csound_preprocessor_highlight_rules",[], function(require, exports, module) {
 "use strict";
 
 var oop = require("../lib/oop");
@@ -272,7 +272,7 @@ oop.inherits(CsoundPreprocessorHighlightRules, TextHighlightRules);
 exports.CsoundPreprocessorHighlightRules = CsoundPreprocessorHighlightRules;
 });
 
-ace.define("ace/mode/csound_score_highlight_rules",["require","exports","module","ace/lib/oop","ace/mode/csound_preprocessor_highlight_rules"], function(require, exports, module) {
+ace.define("ace/mode/csound_score_highlight_rules",[], function(require, exports, module) {
 "use strict";
 
 var oop = require("../lib/oop");
@@ -423,7 +423,7 @@ oop.inherits(CsoundScoreHighlightRules, CsoundPreprocessorHighlightRules);
 exports.CsoundScoreHighlightRules = CsoundScoreHighlightRules;
 });
 
-ace.define("ace/mode/lua_highlight_rules",["require","exports","module","ace/lib/oop","ace/mode/text_highlight_rules"], function(require, exports, module) {
+ace.define("ace/mode/lua_highlight_rules",[], function(require, exports, module) {
 "use strict";
 
 var oop = require("../lib/oop");
@@ -582,7 +582,7 @@ oop.inherits(LuaHighlightRules, TextHighlightRules);
 exports.LuaHighlightRules = LuaHighlightRules;
 });
 
-ace.define("ace/mode/python_highlight_rules",["require","exports","module","ace/lib/oop","ace/mode/text_highlight_rules"], function(require, exports, module) {
+ace.define("ace/mode/python_highlight_rules",[], function(require, exports, module) {
 "use strict";
 
 var oop = require("../lib/oop");
@@ -739,7 +739,7 @@ oop.inherits(PythonHighlightRules, TextHighlightRules);
 exports.PythonHighlightRules = PythonHighlightRules;
 });
 
-ace.define("ace/mode/csound_orchestra_highlight_rules",["require","exports","module","ace/lib/lang","ace/lib/oop","ace/mode/csound_preprocessor_highlight_rules","ace/mode/csound_score_highlight_rules","ace/mode/lua_highlight_rules","ace/mode/python_highlight_rules"], function(require, exports, module) {
+ace.define("ace/mode/csound_orchestra_highlight_rules",[], function(require, exports, module) {
 "use strict";
 
 var lang = require("../lib/lang");
@@ -856,11 +856,9 @@ var CsoundOrchestraHighlightRules = function() {
         "MixerSetLevel",
         "MixerSetLevel_i",
         "OSCinit",
-        "OSCinitM",
         "OSClisten",
         "OSCraw",
         "OSCsend",
-        "OSCsend_lo",
         "S",
         "STKBandedWG",
         "STKBeeThree",
@@ -910,7 +908,6 @@ var CsoundOrchestraHighlightRules = function() {
         "atonex",
         "babo",
         "balance",
-        "balance2",
         "bamboo",
         "barmodel",
         "bbcutm",
@@ -1471,8 +1468,6 @@ var CsoundOrchestraHighlightRules = function() {
         "lorenz",
         "loscil",
         "loscil3",
-        "loscil3phs",
-        "loscilphs",
         "loscilx",
         "lowpass2",
         "lowres",
@@ -1772,6 +1767,7 @@ var CsoundOrchestraHighlightRules = function() {
         "pvsftw",
         "pvsfwrite",
         "pvsgain",
+        "pvsgendy",
         "pvshift",
         "pvsifd",
         "pvsin",
@@ -2009,6 +2005,7 @@ var CsoundOrchestraHighlightRules = function() {
         "sockrecv",
         "sockrecvs",
         "socksend",
+        "socksend_k",
         "socksends",
         "sorta",
         "sortd",
@@ -2109,6 +2106,38 @@ var CsoundOrchestraHighlightRules = function() {
         "tanh",
         "taninv",
         "taninv2",
+        "tb0",
+        "tb0_init",
+        "tb1",
+        "tb10",
+        "tb10_init",
+        "tb11",
+        "tb11_init",
+        "tb12",
+        "tb12_init",
+        "tb13",
+        "tb13_init",
+        "tb14",
+        "tb14_init",
+        "tb15",
+        "tb15_init",
+        "tb1_init",
+        "tb2",
+        "tb2_init",
+        "tb3",
+        "tb3_init",
+        "tb4",
+        "tb4_init",
+        "tb5",
+        "tb5_init",
+        "tb6",
+        "tb6_init",
+        "tb7",
+        "tb7_init",
+        "tb8",
+        "tb8_init",
+        "tb9",
+        "tb9_init",
         "tbvcf",
         "tempest",
         "tempo",
@@ -2294,10 +2323,6 @@ var CsoundOrchestraHighlightRules = function() {
         "lentab",
         "maxtab",
         "mintab",
-        "pop",
-        "pop_f",
-        "push",
-        "push_f",
         "scalet",
         "sndload",
         "soundout",
@@ -2311,44 +2336,11 @@ var CsoundOrchestraHighlightRules = function() {
         "specscal",
         "specsum",
         "spectrum",
-        "stack",
         "sumtab",
         "tabgen",
         "tabmap",
         "tabmap_i",
         "tabslice",
-        "tb0",
-        "tb0_init",
-        "tb1",
-        "tb10",
-        "tb10_init",
-        "tb11",
-        "tb11_init",
-        "tb12",
-        "tb12_init",
-        "tb13",
-        "tb13_init",
-        "tb14",
-        "tb14_init",
-        "tb15",
-        "tb15_init",
-        "tb1_init",
-        "tb2",
-        "tb2_init",
-        "tb3",
-        "tb3_init",
-        "tb4",
-        "tb4_init",
-        "tb5",
-        "tb5_init",
-        "tb6",
-        "tb6_init",
-        "tb7",
-        "tb7_init",
-        "tb8",
-        "tb8_init",
-        "tb9",
-        "tb9_init",
         "vbap16",
         "vbap4",
         "vbap4move",
@@ -2656,7 +2648,7 @@ oop.inherits(CsoundOrchestraHighlightRules, CsoundPreprocessorHighlightRules);
 exports.CsoundOrchestraHighlightRules = CsoundOrchestraHighlightRules;
 });
 
-ace.define("ace/mode/css_highlight_rules",["require","exports","module","ace/lib/oop","ace/lib/lang","ace/mode/text_highlight_rules"], function(require, exports, module) {
+ace.define("ace/mode/css_highlight_rules",[], function(require, exports, module) {
 "use strict";
 
 var oop = require("../lib/oop");
@@ -2850,7 +2842,7 @@ exports.CssHighlightRules = CssHighlightRules;
 
 });
 
-ace.define("ace/mode/doc_comment_highlight_rules",["require","exports","module","ace/lib/oop","ace/mode/text_highlight_rules"], function(require, exports, module) {
+ace.define("ace/mode/doc_comment_highlight_rules",[], function(require, exports, module) {
 "use strict";
 
 var oop = require("../lib/oop");
@@ -2900,7 +2892,7 @@ exports.DocCommentHighlightRules = DocCommentHighlightRules;
 
 });
 
-ace.define("ace/mode/javascript_highlight_rules",["require","exports","module","ace/lib/oop","ace/mode/doc_comment_highlight_rules","ace/mode/text_highlight_rules"], function(require, exports, module) {
+ace.define("ace/mode/javascript_highlight_rules",[], function(require, exports, module) {
 "use strict";
 
 var oop = require("../lib/oop");
@@ -3032,8 +3024,7 @@ var JavaScriptHighlightRules = function(options) {
                 next  : "property"
             }, {
                 token : "storage.type",
-                regex : /=>/,
-                next  : "start"
+                regex : /=>/
             }, {
                 token : "keyword.operator",
                 regex : /--|\+\+|\.{3}|===|==|=|!=|!==|<+=?|>+=?|!|&&|\|\||\?:|[!$%&*+\-~\/^]=?/,
@@ -3373,7 +3364,7 @@ function comments(next) {
 exports.JavaScriptHighlightRules = JavaScriptHighlightRules;
 });
 
-ace.define("ace/mode/xml_highlight_rules",["require","exports","module","ace/lib/oop","ace/mode/text_highlight_rules"], function(require, exports, module) {
+ace.define("ace/mode/xml_highlight_rules",[], function(require, exports, module) {
 "use strict";
 
 var oop = require("../lib/oop");
@@ -3576,7 +3567,7 @@ oop.inherits(XmlHighlightRules, TextHighlightRules);
 exports.XmlHighlightRules = XmlHighlightRules;
 });
 
-ace.define("ace/mode/html_highlight_rules",["require","exports","module","ace/lib/oop","ace/lib/lang","ace/mode/css_highlight_rules","ace/mode/javascript_highlight_rules","ace/mode/xml_highlight_rules"], function(require, exports, module) {
+ace.define("ace/mode/html_highlight_rules",[], function(require, exports, module) {
 "use strict";
 
 var oop = require("../lib/oop");
@@ -3658,7 +3649,7 @@ oop.inherits(HtmlHighlightRules, XmlHighlightRules);
 exports.HtmlHighlightRules = HtmlHighlightRules;
 });
 
-ace.define("ace/mode/csound_document_highlight_rules",["require","exports","module","ace/lib/oop","ace/mode/csound_orchestra_highlight_rules","ace/mode/csound_score_highlight_rules","ace/mode/html_highlight_rules","ace/mode/text_highlight_rules"], function(require, exports, module) {
+ace.define("ace/mode/csound_document_highlight_rules",[], function(require, exports, module) {
 "use strict";
 
 var oop = require("../lib/oop");
@@ -3725,7 +3716,7 @@ oop.inherits(CsoundDocumentHighlightRules, TextHighlightRules);
 exports.CsoundDocumentHighlightRules = CsoundDocumentHighlightRules;
 });
 
-ace.define("ace/mode/csound_document",["require","exports","module","ace/lib/oop","ace/mode/text","ace/mode/csound_document_highlight_rules"], function(require, exports, module) {
+ace.define("ace/mode/csound_document",[], function(require, exports, module) {
 "use strict";
 
 var oop = require("../lib/oop");

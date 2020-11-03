@@ -1,19 +1,32 @@
 # CJK Auto Spacing
 
-A pelican plugin to insert spaces between Chinese/Japanese/Korean characters and English words.
+A pelican plugin to insert space between Chinese/Japanese/Korean character
+and English word.
 
 # Why
 
-For Chinese readers, If Chinese characters and English words are put together without a single tiny space, they are reading for torture rather than pleasure. 
+For Chinese readers, it's reading for torture instead of pleasure if Chinese
+characters and English words are mingled togther without spaces. (See
+[Effects](#effects) for comparison)
 
-Moreover, research shows those who like putting Chinese characters and English words together without space between them have more troubles in love ([why not space?]in Chinese).
-Up to 70% get married with ones they don't love at 34 years old.
-And the remaining 30%, even worse, they have no one to inherent their legacies except their cats. 
+Moreover, research shows that those who love putting Chinese characters and
+English words together without space have more troubles in love ([why space?][]
+in Chinese). Up to 70% marry one they don't love at 34 years old. And the other
+30%, even worse, have nobody to inherit their legacies except cats.
 
-Therefore, it's not hard to conclude that there must be space for pelican users who write in Chinese. 
+So, to Chinese users, it is not hard to see the necessarity of using spaces.
 
-**Note:** I'm not a Japanese or Korean speaker, but the same thing can be concluded. 
-After all, they have lots in common with Chinese. And that's exactly why they, together as a whole, are called CJK Unified Ideographs in unicode standards
+**Note**: I know nothing about Japanese and Korean, but I feel confidently we
+can get the same conclusion. They have lots in common. And perhaps that's why
+they are called CJK Unified Ideographs together as a whole in the unicode
+standards.
+
+# Options
+
+By default it will only process the content. To process title, add following
+line to your `pelicanconf.py`
+
+    CJK_AUTO_SPACING_TITLE = True
 
 # Effects
 
@@ -31,4 +44,7 @@ With CJK Auto Spacing
 
 ![with spacing](./screenshot1.png)
 
-[why not space?]: https://github.com/vinta/paranoid-auto-spacing
+If you find nothing wrong in the first picture, re-read it until you find it's
+wrong.
+
+[why space?]: https://github.com/vinta/paranoid-auto-spacing

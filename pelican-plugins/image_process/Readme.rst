@@ -2,46 +2,69 @@
  Image Process
 ==============
 
-``Image Process`` let you automate the processing of images based on their
+*Image Process* is a plugin for `Pelican <http://docs.getpelican.com/>`_,
+a static site generator written in Python.
+
+*Image Process* let you automate the processing of images based on their
 class attribute. Use this plugin to minimize the overall page weight
 and to save you a trip to Gimp or Photoshop each time you include an
 image in your post.
 
-``Image Process`` also makes it easy to create responsive images using
+*Image Process* also makes it easy to create responsive images using
 the new HTML5 ``srcset`` attribute and ``<picture>`` tag. It does this
 by generating multiple derivative images from one or more sources.
 
-``Image Process`` will not overwrite your original images.
+*Image Process* will not overwrite your original images.
 
-Requirements
+
+Installation
 ============
 
-``Image Process`` requires Beautiful Soup and Pillow. Both can be installed
-with pip:
+The easiest way to install *Image Process* is through the use of pip. This
+will also install the required dependencies automatically.
 
 .. code-block:: sh
 
-   pip install pillow beautifulsoup4
+  pip install pelican_image_process
 
-If you encounter errors while processing JPEG files, you may need to install
-the JPEG development library:
+Then, in your ``pelicanconf.py`` file, add *Image Process* to your list of
+plugins:
+
+.. code-block:: python
+
+  from distutils.sysconfig import get_python_lib
+  PLUGIN_PATHS = [get_python_lib()]
+  PLUGINS = [
+              # ...
+              'pelican_image_process',
+              # ...
+            ]
+
+You will also need to configure your desired transformations (see *Usage*
+below) and add the appropriate class to images you want processed.
+
+Plugin development
+==================
+
+If you want to contribute to this plugin you can easily check out this project and
+use a Pipenv based virtual environment to develop.
+Shortcuts through a ``Makefile`` are provided for development:
 
 .. code-block:: sh
 
-   pip uninstall pillow
-   apt-get install libjpeg-dev
-   pip install pillow
+  make lint
+  make unittest
 
 
 Usage
 =====
 
-``Image Process`` scans your content for ``<img>`` tags with special
+*Image Process* scans your content for ``<img>`` tags with special
 classes. It then maps the classes to a set of image processing
 instructions, computes new images and modifies HTML code according to
 the instructions.
 
-Define transformations
+Define Transformations
 ----------------------
 
 The first step in using this module is to define some image
@@ -50,7 +73,7 @@ are defined in the ``IMAGE_PROCESS`` dictionary, mapping a
 transformation name to a list of operations. There are three kinds of
 transformations: image replacement, responsive image and picture set.
 
-Image replacement
+Image Replacement
 ~~~~~~~~~~~~~~~~~
 
 The simplest image processing will replace the original image by a
@@ -61,11 +84,11 @@ compute a thumbnail from a larger image:
 .. code-block:: python
 
   IMAGE_PROCESS = {
-      'article-image': ["scale_in 300 300"],
-      'thumb': ["crop 0 0 50% 50%", "scale_out 150 150", "crop 0 0 150 150"],
+      'article-image': ["scale_in 300 300 True"],
+      'thumb': ["crop 0 0 50% 50%", "scale_out 150 150 True", "crop 0 0 150 150"],
       }
 
-These transformations tell ``Image process`` to transform the image
+These transformations tell *Image Process* to transform the image
 referred by the ``src`` attribute of an ``<img>`` according to the
 list of operations specified and replace the ``src`` attribute by the
 URL of the transformed image.
@@ -77,10 +100,10 @@ below, there is an alternative syntax for the processing instructions:
 
   IMAGE_PROCESS = {
       'thumb': {'type': 'image',
-                'ops': ["crop 0 0 50% 50%", "scale_out 150 150", "crop 0 0 150 150"],
-                }
+                'ops': ["crop 0 0 50% 50%", "scale_out 150 150 True", "crop 0 0 150 150"],
+                },
       'article-image': {'type': 'image',
-                        'ops': ["scale_in 300 300"],
+                        'ops': ["scale_in 300 300 True"],
                         }
       }
 
@@ -114,13 +137,13 @@ the ``figure`` directive:
    smoothly, do not use underscores in your transformation names.
 
 
-Responsive image
+Responsive Image
 ~~~~~~~~~~~~~~~~
 
-You can use ``Image process`` to automatically generate a set of
+You can use *Image Process* to automatically generate a set of
 images that will be selected for display by browsers according to the
 viewport width or according to the device resolution. To accomplish
-this, ``Image process`` will add a ``srcset`` attribute (and maybe a
+this, *Image Process* will add a ``srcset`` attribute (and maybe a
 ``media`` and a ``sizes`` attribute) to the ``<img>``.
 
 Note that the ``srcset`` syntax is currently not supported by all
@@ -140,9 +163,9 @@ introduction to the ``srcset`` and ``<picture>`` syntaxes.
 
 .. _this article: http://www.smashingmagazine.com/2014/05/14/responsive-images-done-right-guide-picture-srcset/
 
-To tell ``Image process`` to generate a responsive image, add a
+To tell *Image Process* to generate a responsive image, add a
 ``responsive-image`` transformation to your your ``IMAGE_PROCESS``
-dictionnary, with the following syntax:
+dictionary, with the following syntax:
 
 .. code-block:: python
 
@@ -195,7 +218,7 @@ one of the images in the ``srcset``. However, the ``default`` value
 could also be a list of operations to generate a different derivative
 image.
 
-To make the images in your article responsives, you must add them the
+To make the images in your article responsive, you must add them the
 special class ``image-process-`` followed by the name of the
 transformation you wish to apply, exactly like you would do for the
 image replacement case, described above. So, if you write your content
@@ -218,20 +241,18 @@ the ``figure`` directive:
       :class: image-process-large-photo
 
 
-Picture set
+Picture Set
 ~~~~~~~~~~~
 
-``Image process`` can be use to generate the images used by a
+*Image Process* can be use to generate the images used by a
 ``<picture>`` tag. The ``<picture>`` syntax allows for more
 flexibility in providing a choice of image to the browser. Again, if
 you want to know more about HTML5 responsive images, see `this
 article`_ for a gentle introduction to the ``srcset`` and
 ``<picture>`` syntaxes.
 
-.. _this article: http://www.smashingmagazine.com/2014/05/14/responsive-images-done-right-guide-picture-srcset/
-
-To tell ``Image process`` to generate the images for a ``<picture>``,
-add a ``picture`` entry to your ``IMAGE_PROCESS`` dictionnary with the
+To tell *Image Process* to generate the images for a ``<picture>``,
+add a ``picture`` entry to your ``IMAGE_PROCESS`` dictionary with the
 following syntax:
 
 .. code-block:: python
@@ -318,7 +339,7 @@ Transformations
 
 Available operations for transformations are:
 
-crop *top* *left* *right* *bottom*
+crop <top> <left> <right> <bottom>
   Crop the image to the box (*left*, *top*)-(*right*, *bottom*). Values
   can be absolute (a number) or relative to the size of the image (a
   number followed by a percent sign ``%``).
@@ -337,17 +358,17 @@ resize *width* *height*
   ratio. Values can be absolute (a number) or relative to the
   size of the image (a number followed by a percent sign ``%``).
 
-rotate degree
+rotate <degrees>
   Rotate the image.
 
-scale_in *width* *height* *upscale*
+scale_in <width> <height> <upscale>
   Resize the image. This operation preserves the image aspect ratio
   and the resulting image will be no larger than *width* x
   *height*. Values can be absolute (a number) or relative to the
   size of the image (a number followed by a percent sign ``%``).
   If *upscale* is False, smaller images will not be enlarged.
 
-scale_out *width* *height* *upscale*
+scale_out <width> <height> <upscale>
   Resize the image. This operation preserves the image aspect ratio
   and the resulting image will be no smaller than *width* x
   *height*. Values can be absolute (a number) or relative to the
@@ -397,14 +418,14 @@ its first parameter and it should return the transformed image:
       return image
 
   IMAGE_PROCESS = {
-      'face-thumbnail': [crop_face, "scale_out 150 150"]
+      'face-thumbnail': [crop_face, "scale_out 150 150 True"]
       }
 
 
-Additional settings
+Additional Settings
 -------------------
 
-Destination directory
+Destination Directory
 ~~~~~~~~~~~~~~~~~~~~~
 
 By default, the new images will be stored in a directory named
@@ -424,7 +445,7 @@ You can replace ``derivative`` by something else using the
    IMAGE_PROCESS_DIR = 'derivees'
 
 
-Force image processing
+Force Image Processing
 ~~~~~~~~~~~~~~~~~~~~~~
 
 If the transformed image already exists and is newer than the original
@@ -438,7 +459,7 @@ file.
    IMAGE_PROCESS_FORCE = True
 
 
-Selecting a HTML parser
+Selecting a HTML Parser
 ~~~~~~~~~~~~~~~~~~~~~~~
 
 You may select the HTML parser which is used. The default is the builtin
@@ -452,8 +473,34 @@ You may select the HTML parser which is used. The default is the builtin
 For details, refer to the `BeautifulSoup documentation on parsers
 <https://www.crummy.com/software/BeautifulSoup/bs4/doc/#installing-a-parser>`_.
 
+
+File Encoding
+~~~~~~~~~~~~~
+
+You may select a different file encoding to be used by BeautifulSoup as it
+opens your files. The default is ``uft-8``.
+
+.. code-block:: python
+
+  IMAGE_PROCESS_ENCODING = "uft-8"
+
+
+Known Issues
+============
+
+- Pillow, when resizing animated GIF files, does not return an animated file
+- the ``setup.py`` file for this project does not run on Python 2.7. However,
+  wheels of this project are "universal" and so can be generated by Python 3
+  and subsequently installed by Python 2.7.
+- test mostly pass, but not entirely. The tests also fail on Windows due to
+  path separator issues. The test suite remains a work in progress.
+- version 1.1.2, as uploaded to PyPI, is broken; use a different version. (see
+  `issue #2 <https://github.com/MinchinWeb/minchin.pelican.plugins.image_process/issues/2>`_
+  for details)
+
+
 Credits
--------
+=======
 
 Pelican image in test data by Jon Sullivan. Source:
 http://www.pdphoto.org/PictureDetail.php?mat=&pg=5726

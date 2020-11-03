@@ -24,6 +24,7 @@ try:
     from PIL import ImageDraw
     from PIL import ImageEnhance
     from PIL import ImageFont
+    from PIL import ImageOps
 except ImportError:
     logger.error('PIL/Pillow not found')
 
@@ -38,13 +39,13 @@ else:
 
 
 def initialized(pelican):
-
     p = os.path.expanduser('~/Pictures')
 
     DEFAULT_CONFIG.setdefault('PHOTO_LIBRARY', p)
     DEFAULT_CONFIG.setdefault('PHOTO_GALLERY', (1024, 768, 80))
     DEFAULT_CONFIG.setdefault('PHOTO_ARTICLE', (760, 506, 80))
     DEFAULT_CONFIG.setdefault('PHOTO_THUMB', (192, 144, 60))
+    DEFAULT_CONFIG.setdefault('PHOTO_SQUARE_THUMB', False)
     DEFAULT_CONFIG.setdefault('PHOTO_GALLERY_TITLE', '')
     DEFAULT_CONFIG.setdefault('PHOTO_ALPHA_BACKGROUND_COLOR', (255, 255, 255))
     DEFAULT_CONFIG.setdefault('PHOTO_WATERMARK', False)
@@ -71,6 +72,7 @@ def initialized(pelican):
         pelican.settings.setdefault('PHOTO_GALLERY', (1024, 768, 80))
         pelican.settings.setdefault('PHOTO_ARTICLE', (760, 506, 80))
         pelican.settings.setdefault('PHOTO_THUMB', (192, 144, 60))
+        pelican.settings.setdefault('PHOTO_SQUARE_THUMB', False)
         pelican.settings.setdefault('PHOTO_GALLERY_TITLE', '')
         pelican.settings.setdefault('PHOTO_ALPHA_BACKGROUND_COLOR', (255, 255, 255))
         pelican.settings.setdefault('PHOTO_WATERMARK', False)
@@ -96,7 +98,6 @@ def read_notes(filename, msg=None):
             for line in text.splitlines():
                 if line.startswith('#'):
                     continue
-
                 m = line.split(':', 1)
                 if len(m) > 1:
                     pic = m[0].strip()
@@ -107,7 +108,7 @@ def read_notes(filename, msg=None):
                     notes[line] = ''
     except Exception as e:
         if msg:
-            logger.warning('{} at file {}'.format(msg, filename))
+            logger.info('{} at file {}'.format(msg, filename))
         logger.debug('read_notes issue: {} at file {}. Debug message:{}'.format(msg, filename, e))
     return notes
 
@@ -126,7 +127,6 @@ def isalpha(img):
 def remove_alpha(img, bg_color):
     background = Image.new("RGB", img.size, bg_color)
     background.paste(img, mask=img.split()[3])  # 3 is the alpha channel
-
     return background
 
 
@@ -149,7 +149,6 @@ def ReduceOpacity(im, opacity):
 
 
 def watermark_photo(image, settings):
-
     margin = [10, 10]
     opacity = 0.6
 
@@ -189,7 +188,6 @@ def watermark_photo(image, settings):
 
 
 def rotate_image(img, exif_dict):
-
     if "exif" in img.info and piexif.ImageIFD.Orientation in exif_dict["0th"]:
         orientation = exif_dict["0th"].pop(piexif.ImageIFD.Orientation)
         if orientation == 2:
@@ -201,7 +199,7 @@ def rotate_image(img, exif_dict):
         elif orientation == 5:
             img = img.rotate(-90).transpose(Image.FLIP_LEFT_RIGHT)
         elif orientation == 6:
-            img = img.rotate(-90)
+            img = img.rotate(-90, expand=True)
         elif orientation == 7:
             img = img.rotate(90).transpose(Image.FLIP_LEFT_RIGHT)
         elif orientation == 8:
@@ -211,7 +209,6 @@ def rotate_image(img, exif_dict):
 
 
 def build_license(license, author):
-
     year = datetime.datetime.now().year
     license_file = os.path.join(DEFAULT_CONFIG['plugin_dir'], 'licenses.json')
 
@@ -225,7 +222,6 @@ def build_license(license, author):
 
 
 def manipulate_exif(img, settings):
-
     try:
         exif = piexif.load(img.info['exif'])
     except Exception:
@@ -254,16 +250,23 @@ def manipulate_exif(img, settings):
 
 
 def resize_worker(orig, resized, spec, settings):
-
     logger.info('photos: make photo {} -> {}'.format(orig, resized))
     im = Image.open(orig)
 
     if ispiexif and settings['PHOTO_EXIF_KEEP'] and im.format == 'JPEG':  # Only works with JPEG exif for sure.
-        im, exif_copy = manipulate_exif(im, settings)
+        try:
+            im, exif_copy = manipulate_exif(im, settings)
+        except:
+            logger.info('photos: no EXIF or EXIF error in {}'.format(orig))
+            exif_copy = b''
     else:
         exif_copy = b''
 
     icc_profile = im.info.get("icc_profile", None)
+
+    if settings['PHOTO_SQUARE_THUMB'] and spec == settings['PHOTO_THUMB']:
+        im = ImageOps.fit(im, (spec[0], spec[1]), Image.ANTIALIAS)
+
     im.thumbnail((spec[0], spec[1]), Image.ANTIALIAS)
     directory = os.path.split(resized)[0]
 
@@ -309,7 +312,6 @@ def resize_photos(generator, writer):
 
 
 def detect_content(content):
-
     hrefs = None
 
     def replacer(m):
@@ -449,7 +451,6 @@ def galleries_string_decompose(gallery_string):
 
 
 def process_gallery(generator, content, location):
-
     content.photo_gallery = []
 
     galleries = galleries_string_decompose(location)
@@ -529,12 +530,11 @@ def file_clipper(x):
 
 
 def process_image(generator, content, image):
-
     if image.startswith('{photo}'):
         path = os.path.join(os.path.expanduser(generator.settings['PHOTO_LIBRARY']), image_clipper(image))
         image = image_clipper(image)
     elif image.startswith('{filename}'):
-        path = os.path.join(content.relative_dir, file_clipper(image))
+        path = os.path.join(generator.path, content.relative_dir, file_clipper(image))
         image = file_clipper(image)
 
     if os.path.isfile(path):

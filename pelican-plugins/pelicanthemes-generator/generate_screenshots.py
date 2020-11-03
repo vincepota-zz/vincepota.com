@@ -13,20 +13,12 @@ import os
 
 # Search all template files
 def list_themes(themesroot):
-    ignore = [
-        'dev-random', 'dev-random2', 'html5-dopetrope', 'irfan',
-        'nmnlist', 'pelican-bootstrap3', 'storm', 'syte',
-        'bold', 'bootlex', 'bootstrap', 'built-texts', 'elegant',
-        'gum', 'lannisport', 'pure', 'tuxlite_tbs',
-    ]
     dirlist = []
-
     allfiles = os.listdir(themesroot)
     for dirname in allfiles:
         dirname = dirname.lower()
-        if dirname not in ignore:
-            if os.path.isdir('%s/%s/templates' % (themesroot, dirname)):
-                dirlist.append(dirname)
+        if os.path.isdir('%s/%s/templates' % (themesroot, dirname)):
+            dirlist.append(dirname)
 
     return sorted(dirlist)
 
@@ -42,12 +34,7 @@ def generate_screenshot(themesroot, theme):
             os.system("rm -rf output/*")
             os.system("make html")
 
-            # print("Sleep")
-            # time.sleep(20)
-            # print("Ready for snap")  
-            
-            params = '--min-width=1024 --delay=2000 --max-wait=2000 --max-width=1024 --max-height=2048'
-            
+            params = '--min-width=1024 --delay=2000 --max-wait=2000'
             os.system("CutyCapt %s --url=http://localhost:8000 --out=content/static/%s_index_tmp.png" % (params, theme))
             os.system("CutyCapt %s --url=http://localhost:8000/details-information-for-%s-theme.html --out=content/static/%s_article_tmp.png" % (params, theme, theme))
             os.system("convert content/static/%s_index_tmp.png -trim content/static/%s_index.png" % (theme, theme)) 
@@ -56,13 +43,21 @@ def generate_screenshot(themesroot, theme):
             os.system("convert content/static/%s_article.png -resize %s  -gravity north -crop 410x307 content/static/small_%s_article.png" % (theme, '410x307', theme)) 
             os.system("rm content/static/%s_*_tmp.png" % theme)
 
-                     
-            #os.popen("CutyCapt --url=file:///LIVE/projects/pelicanthemes-generator/output/index.html --out=content/static/%s_index.png" % theme)
+def create_directories():
+    dirs = ['output', 'content/static', 'confs']
+    for directory in dirs:
+        if not os.path.exists(directory):
+            os.makedirs(directory)
+
 
 def generate_screenshots(themesroot):
+    create_directories()
+    # Generate all screenshots
     themes = list_themes(themesroot)
     for theme in themes:
-        generate_screenshot(themesroot, theme)
+        confname = 'confs/%s_pelicanconf.py' % theme
+        if os.path.exists(confname):
+            generate_screenshot(themesroot, theme)
 
     generate_screenshot(themesroot, 'jesuislibre')
 

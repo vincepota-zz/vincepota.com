@@ -20,6 +20,9 @@ The plug-in resizes the referred photos, and generates thumbnails for galleries 
 `PHOTO_THUMB = (192, 144, 60)`
 :	For thumbnails, maximum width, height, and quality.
 
+`PHOTO_SQUARE_THUMB = False`
+:	Crops thumbnails to make them square.
+
 `PHOTO_RESIZE_JOBS = 5`
 : Number of parallel resize jobs to be run. Defaults to 1.
 
@@ -75,7 +78,7 @@ Folders of photos may optionally have three text files, where each line describe
 `exif.txt`
 :	Associates compact technical information with photos, typically the camera settings. For example:
 
-	best:jpg: Canon EOS 5D Mark II - 20mm f/8 1/250s ISO 100
+	best.jpg: Canon EOS 5D Mark II - 20mm f/8 1/250s ISO 100
 	night.jpg: Canon EOS 5D Mark II - 47mm f/8 5s ISO 100
 	# new.jpg: Canon EOS 5D Mark II - 47mm f/8 5s ISO 100
 

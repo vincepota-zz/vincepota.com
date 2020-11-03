@@ -3,7 +3,7 @@
 
 AUTHOR = u'Vince Pota'
 SITENAME = u'vincepota.com'
-SITEURL = 'http://www.vincepota.com'
+SITEURL = ''
 TIMEZONE = 'Etc/Greenwich'
 TITLE = "A data science blog."
 DESCRIPTION = "A wesbiste about data science, data and nice looking visualisations"
@@ -23,8 +23,8 @@ NAVIGATION = [
 
 # Static Pages
 PAGE_PATHS = ['pages']
-# PAGE_URL = '{slug}/'
-# PAGE_SAVE_AS = '{slug}/index.html'
+PAGE_URL = '{slug}/'
+PAGE_SAVE_AS = '{slug}/index.html'
 ABOUT_PAGE_HEADER = 'Welcome to my blog'
 
 # DEFAULTS
@@ -36,15 +36,15 @@ DEFAULT_PAGINATION = False
 # LOCALE = ('en', 'it_IT', 'it')
 
 # FEEDS
-FEED_ALL_ATOM = "feeds/all.atom.xml"
-TAG_FEED_ATOM = "feeds/tag/%s.atom.xml"
+# FEED_ALL_ATOM = "feeds/all.atom.xml"
+# TAG_FEED_ATOM = "feeds/tag/%s.atom.xml"
 
 DISPLAY_PAGES_ON_MENU = True
 MARKUP = ('md', 'ipynb')
 
 # PLUGINS
 PLUGIN_PATHS = ['pelican-plugins', 'pelican_dynamic']
-PLUGINS = ['assets', 'pelican-ipynb.liquid', 'pelican_dynamic']
+PLUGINS = ['assets', 'pelican_dynamic']
 
 DISQUS_SITENAME = 'vincepota'
 

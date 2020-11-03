@@ -3,10 +3,10 @@ Page Hierarchy
 *Author: Ahmad Khayyat (<akhayyat@gmail.com>)*
 
 A [Pelican][1] plugin that creates a URL hierarchy for pages that
-matches the filesystem hierarchy of their sources. For example, the
-following filesystem structure for page sources will result in the
-URLs listed next to each page when this plugin is used with the
-default pelican settings.
+matches the filesystem hierarchy of their sources.
+
+For example, to have the following filesystem structure of page
+sources result in the URLs listed next to each file,
 
 ```text
 └── content/pages/           #   PAGE_DIR
@@ -20,28 +20,31 @@ default pelican settings.
     └── contact.md           # URL: pages/contact/
 ```
 
-To remove the `pages/` prefix and have pages at the root of your site:
+you can use this plugin with the following Pelican settings:
 
 ```python
 # pelicanconf.py
-PATH_METADATA = 'pages/(?P<path>.*)\..*'
+PAGE_URL = '{slug}/'
+PAGE_SAVE_AS = '{slug}/index.html'
+SLUGIFY_SOURCE = 'basename'
 ```
 
-More generally, any value for the `PATH_METADATA` pelican setting that
-defines a `path` group will result in using the matching part of the
-source file path as the path for that page in the URL. This allows
-capturing other metadata from the source path.
+When generating the `url` and `save_as` attributes, the plugin
+prefixes the page's `slug` by its relative path. Although the initial
+`slug` is generated from the page's `title` by default, it can be
+generated from the source file basename by setting the
+`SLUGIFY_SOURCE` setting to `'basename'`, as shown in the settings
+snippet above. The `slug` can also be set using [`PATH_METADATA`][2].
 
-In order to maintain a URL hierarchy that is consistent with the
-filesystem hierarchy, the slug of each page is forced to be its source
-base filename. The page title and its slug attribute have no effect.
+This plugin is compatible with [Pelican translations][3].
 
 Parent and Children Pages
 -------------------------
 This plugin also adds three attributes to each page object:
 
 - `parent`: the immediate parent page. `None` if the page is
-  top-level.
+  top-level. If a translated page has no parent, the default-language
+  parent is used.
 
 - `parents`: a list of all ancestor pages, starting from the top-level
   ancestor.
@@ -67,4 +70,12 @@ breadcrumbs:
 ```
 
 
+License
+-------
+
+Licence: BSD. See the included `LICENSE` file.
+
+
 [1]: http://getpelican.com/
+[2]: http://docs.getpelican.com/en/latest/settings.html#path-metadata
+[3]: http://docs.getpelican.com/en/latest/settings.html#translations

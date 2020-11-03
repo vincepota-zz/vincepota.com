@@ -49,9 +49,9 @@ You can also specify a `width`, `height` and `alignment`
 .. code-block:: rst
 
 	.. vimeo:: 37818131
-        :width: 800
-        :height: 500
-        :align: center
+            :width: 800
+            :height: 500
+            :align: center
 
 Which will result in:
 
@@ -60,6 +60,10 @@ Which will result in:
     <div class="vimeo" align="center">
     <iframe width="800" height="500" src="https://player.vimeo.com/video/37818131" frameborder="0"></iframe>
     </div>
+
+Additionally, you can also specify `player URL parameters
+<https://vimeo.zendesk.com/hc/en-us/articles/360001494447>`__ appended
+to the video ID (e.g., ``.. vimeo:: 37818131?autoplay=1``).
 
 License
 =======

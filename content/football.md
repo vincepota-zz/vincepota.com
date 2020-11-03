@@ -16,14 +16,14 @@ The data consist in the final tables (from about 1930 to date, with the exceptio
 
 The first thing to think about is that the number of teams per league is not a constant. Moreover, the number of teams can change with years as you can see from the first figure.
 
-![I am text]({filename}/images/fb_pos.png)
+![I am text]({static}/images/fb_pos.png)
 
 The English were already “full-on” in the 20’s, whereas the other leagues somehow evolved with time. Note that most of the leagues were suspended around 1944-1947 because of the second world war. I filled these gaps using an [interpolation technique](https://en.wikipedia.org/wiki/Interpolation) .
 
 With this in mind, you understand that if we compare the average number of victories in La Liga in 1970 with the average number of victories in the Premier League in 1970, this will not be a fair comparison because Premier League had twice the number of teams as La Liga. A way to approach this issue is to divide our quantity of interest by the number of teams per league during a particular year. The difference between the two approaches is clear in the following figure:
 
-![I am text]({filename}/images/fb_Wn.png)
-![I am text]({filename}/images/fb_W.png)
+![I am text]({static}/images/fb_Wn.png)
+![I am text]({static}/images/fb_W.png)
 
 Looking at the average number of victories divided by the number of teams we notice two interesting things:
 
@@ -35,7 +35,7 @@ Looking at the average number of victories divided by the number of teams we not
 
 Having a low number of average victories does not mean that teams lose, but rather than they tie. This is confirmed by the average number of draws per year, which again confirms that Serie A games in the 70’s and 80’s were very boring to watch.
 
-![I am text]({filename}/images/fb_Dn.png)
+![I am text]({static}/images/fb_Dn.png)
 
 ----
 
@@ -43,13 +43,13 @@ We can get additional insights into the data if, instead of looking at the avera
 
 In this case, league statistics are more consistent with each other, but I find interesting the trend observed for La Liga, which shows a boost in the maximum number of victories with a period of about 25 years. Moreover, the superior quality of Barcelona and Real Madrid in the last 10 years has produced a further peak in maximum number of victories, the highest ever recorded.
 
-![I am text]({filename}/images/fb_M_Wn.png)
+![I am text]({static}/images/fb_M_Wn.png)
 
 -----
 
 Now, let’s look at the average number of goals scored (divided by the number of teams) as a function of year. This one looks very interesting.
 
-![I am text]({filename}/images/fb_GFn.png)
+![I am text]({static}/images/fb_GFn.png)
 
 In the early 60’s all teams started to score less and less. Teams in the Premier League (the only league to have roughly a constant number of teams per season)  were scoring an average of 80 goals in 1930, which dropped to 50 goals in 1980. I am not sure why this happened. I suspect it has to do with the increasing importance given to strategy and technique, rather than a bunch of guys running randomly behind a ball. Note that the Bundesliga praises, on average, the highest number of goals scored (relative to the number of teams). Ligue 1 saw a gradual drop in the average number of goals scored from 1940 to date. And right now Ligue 1 is the lowest scoring league among the five studied here.
 
@@ -57,7 +57,7 @@ In the early 60’s all teams started to score less and less. Teams in the Premi
 
 Lastly, it is interesting to look at the two-dimensional density distribution of the data in a Drawn vs. Won plane, ignoring (but keeping in mind) that the number of teams per league is not a constant.
 
-![I am text]({filename}/images/fb_W_vs_D.png)
+![I am text]({static}/images/fb_W_vs_D.png)
 
 This figure tells us that Premier League teams have won an average of 15 games and have drawn an average of 10 games per season. Whereas the average Spanish team have won 13 games and have drawn 8 games per season. In other words, the average result for an average team in European leagues is to win between 10-15 games and to tie about 10 games per season. If you can do better than this, then you are one of the top teams running for the title. Note also that Ligue 1 and Bundesliga teams rarely won more than 25 games per season, conversely to Premier League, Serie A and La Liga.
 
