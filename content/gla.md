@@ -13,7 +13,7 @@ The data come from the “London GLA spending” website, where GLA stands for G
 
 The webpage looks like this:
 
-![gla_web_screenshot]({filename}/images/gla_web_screenshot.png)
+![gla_web_screenshot]({static}/images/gla_web_screenshot.png)
 
 where we are interested in the content of the CSV file column.
 
@@ -94,7 +94,7 @@ thelist[0:5]
 We can now download the data. Instead of downloading every csv files to disk, one can use pandas ability to read csv files straight from the internet.
 Before we do that, let’s see how the head of a csv file looks like in excel:
 
-![gla_excel]({filename}/images/gla_excel.png)
+![gla_excel]({static}/images/gla_excel.png)
 
 We want to discard the information stored in the first few lines. The actual data start from where columns names are: `Vendor ID`, `Vendor Name`, `Cost Element`, etc..
 
@@ -184,7 +184,7 @@ df.sort_values('Clearing Date').plot(x = 'Clearing Date', y = 'Amount',legend=No
 plt.ylabel('Amount')
 ```
 
-![gla_amount]({filename}/images/gla_amount.png)
+![gla_amount]({static}/images/gla_amount.png)
 
 which shows that expenditures boosted after August 2015. For the record, 1e8 means 10^8 = 100,000,000 = 100 million pounds.
 
@@ -261,7 +261,7 @@ _ = [texts[i] for i in range(0,len(total))]
 plt.title('GLA Total Spendings (2013-2016)', x=1.3,y=0.8, fontsize=15)
 ```
 
-![gla_pie]({filename}/images/gla_pie.png)
+![gla_pie]({static}/images/gla_pie.png)
 
 _Amount spent for each directorate grouped by year. Note the log scale on the x-axis_
 
@@ -276,7 +276,7 @@ plt.legend(title='YEAR', loc=9, bbox_to_anchor=(1.2,1), labels=labels)
 
 plt.xlabel(u'log (Amount) in \u00A3  ')
 ```
-![gla_bar]({filename}/images/gla_histo.png)
+![gla_bar]({static}/images/gla_histo.png)
 
 I do not know if `DEVELOPMENT` and `ENVIRONMENT` is the same as `DEVELOPMENT, ENTERPRISE and ENVIRONMENT`, or if `HOUSING AND REGENERATION` is a different name for `HOUSING AND LAND`. If so, their total `Amount` should be summed together.
 While writing, we are only half way through 2016, which explains why the expenditure in 2016 is generally less than expenditure in 2015.

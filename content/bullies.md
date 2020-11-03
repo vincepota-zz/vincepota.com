@@ -14,10 +14,10 @@ I wanted to have a feeling of how many innocent people died because of these stu
 The source-code to scrap the data and plot the graphs below can be found [here](https://github.com/vincepota/mafia-victims). The graph below shows the cumulative mafia death tool since the first recorded case in 1861. Cumulative means that at every point in time on the x-axis, the death tool on the y-axis is the successive additions of the victims from previous years.
 
 
-![I am text]({filename}/images/mafia.png)
+![I am text]({static}/images/mafia.png)
 
 The three datasets show the same trend. Libera.it seems to be more complete compared to the other two sources. The message is clear: between 800 and 1000 innocent people were killed by mafia in the last century. A more accurate number is probably over a thousand (1126 as in March 2017). Death tool started rising in the 80’s, reaching 64 in 1983 and 83 in 1989, the worst year on record. These were years of political and social turmoil in Italy when many more people were killed in terror attacks not related to mafia. In the 90’s and 2000’s deaths have been gradually decreasing and we now have an average of 3 innocent victims per year.
 
-![I am text]({filename}/images/mafia_discrete.png)
+![I am text]({static}/images/mafia_discrete.png)
 
 How do we fix this? Jailing all these criminals today will not fix the problem. Kids and teenagers growing-up in an environment heavily colluded with the mafia will likely become criminals themselves. Not their fault. It is with prevention and education that we stop the kids of today growing up as mafia bosses. Local communities are doing their best and huge progresses have been made in the past years. There are people devoting (literally) their own lives to eradicate mafia from the Italian culture. These people are my heroes. They make me proud of being Italian.
