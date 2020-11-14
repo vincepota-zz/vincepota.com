@@ -44,7 +44,7 @@ MARKUP = ('md', 'ipynb')
 
 # PLUGINS
 PLUGIN_PATHS = ['pelican-plugins', 'pelican_dynamic']
-PLUGINS = ['assets', 'pelican_dynamic']
+PLUGINS = ['assets', 'pelican_dynamic', 'render_math']
 
 DISQUS_SITENAME = 'vincepota'
 
